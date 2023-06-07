@@ -1,4 +1,4 @@
-# Abir-Hossain
+# Abir Hossain
 
 ### Hi! I'm currently pursuing my Bachelor's Degree at Western Michigan Univeristy.
 

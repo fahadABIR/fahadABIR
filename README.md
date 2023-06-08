@@ -1,6 +1,6 @@
 # Abir Hossain
 
-### Full stack Software Developer
+### Software Developer
 
 
 

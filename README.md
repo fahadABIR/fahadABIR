@@ -4,7 +4,7 @@
 
 
 
-#### In recent years, I have acquired proficiency in an array of programming languages and frameworks including:
+#### Programming languages and frameworks including:
 <p align = "left">
   <img alt="JavaScript" width="30" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/javascript/javascript.png">
   <img alt="Pyhton" width="30" src="https://raw.githubusercontent.com/github/explore/80688e429a7d4ef2fca1e82350fe8e3517d3494d/topics/python/python.png">

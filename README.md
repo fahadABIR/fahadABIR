@@ -27,7 +27,7 @@
 <p align ="left">
   <img alt="KPL" width="40px" src="https://www.kalamazooarts.org/wp-content/uploads/sites/www.kalamazooarts.org/images/org/10050/kpl.jpg">
   <img alt="WMU" width="40px" src="https://media.licdn.com/dms/image/C560BAQE9-K9PnQclIg/company-logo_100_100/0/1633032392527?e=1694044800&v=beta&t=alTELlKVAgXl3RZfqxeFSJqpKhOacMzJ7S4NgHpsIcg">
-  <img alt="Volvo" width="40px" src="https://media.licdn.com/dms/image/C4D0BAQHkyOpGvpYu9g/company-logo_200_200/0/1632473257972?e=1694044800&v=beta&t=CIsQLGQLhdqWwZoBaTbxl2MUwz9NlpechZ_aN-WGqE4](https://abirh.net/logos/volvoW.webp">
+  <img alt="Volvo" width="40px" src="[https://media.licdn.com/dms/image/C4D0BAQHkyOpGvpYu9g/company-logo_200_200/0/1632473257972?e=1694044800&v=beta&t=CIsQLGQLhdqWwZoBaTbxl2MUwz9NlpechZ_aN-WGqE4](https://abirh.net/logos/volvoW.webp](https://abirh.net/logos/volvoW.webp)">
 </p>                                                                                                                                          
 
 

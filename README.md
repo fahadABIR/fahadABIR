@@ -12,6 +12,4 @@ Python {NumPy • Pandas • Matplotlib • CV Zone • TensorFlow • Django �
 
 
 #### Find me @
-abir.hossain@wmich.edu 
-https://www.linkedin.com/in/abir-hossain2964/
 https://abirh.net/

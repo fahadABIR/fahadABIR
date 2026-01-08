@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fahadABIR | Portfolio</title>
+  <meta name="description" content="Minimal photographer landing page." />
+  <style>
+    :root{
+      --bg:#0b0c0f;
+      --fg:#f5f6f7;
+      --muted:rgba(245,246,247,.72);
+      --shadow:0 18px 60px rgba(0,0,0,.45);
+      --radius:18px;
+      --max:1100px;
+      --pad:clamp(18px, 4vw, 42px);
+
+      --blog-card-w: clamp(340px, 44vw, 560px);
+      --blog-gap: 22px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      background:var(--bg);
+      color:var(--fg);
+      overflow-x:hidden;
+    }
+
+    html{scroll-behavior:smooth}
+
+    /* Sections */
+    .panel{
+      min-height:100vh;
+      position:relative;
+      display:flex;
+      align-items:flex-end;
+      justify-content:center;
+      padding:var(--pad);
+      isolation:isolate;
+    }
+
+    .panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(1200px 900px at 20% 10%, rgba(0,0,0,.25), transparent 55%),
+        linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.12) 45%, rgba(0,0,0,.55));
+      z-index:0;
+      pointer-events:none;
+    }
+
+    .panel .bg{
+      position:absolute;
+      inset:0;
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      transform:translateZ(0);
+      z-index:-1;
+    }
+
+    @media (prefers-reduced-motion: no-preference){
+      .panel .bg{background-attachment:fixed}
+    }
+    @media (max-width: 900px){
+      .panel .bg{background-attachment:scroll}
+    }
+
+    /* Top nav */
+    header{
+      position:fixed;
+      top:0;
+      left:0;
+      right:0;
+      z-index:50;
+      padding:14px var(--pad);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      transition: transform .22s ease, opacity .22s ease;
+      will-change: transform;
+    }
+    header.is-hidden{transform: translateY(-120%); opacity:0}
+
+    .nav{
+      width:min(var(--max), 100%);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      pointer-events:auto;
+      padding:10px 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,12,15,.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius:999px;
+      box-shadow: 0 10px 36px rgba(0,0,0,.35);
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      text-decoration:none;
+      color:var(--fg);
+      letter-spacing:.12em;
+      text-transform:none;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .links{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+    .links a{
+      color:rgba(245,246,247,.72);
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:999px;
+      transition: background .2s ease, color .2s ease, border-color .2s ease;
+      border:1px solid transparent;
+    }
+    .links a:hover{color:var(--fg); background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12)}
+
+    .hamburger{
+      display:none;
+      align-items:center;
+      justify-content:center;
+      width:42px;
+      height:42px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: var(--fg);
+      cursor:pointer;
+      transition: background .2s ease, border-color .2s ease, transform .15s ease;
+    }
+    .hamburger:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22)}
+    .hamburger:active{transform: translateY(1px)}
+    .hamburger span{display:block;width:18px;height:2px;background:rgba(245,246,247,.9);border-radius:2px;position:relative}
+    .hamburger span::before,.hamburger span::after{content:"";position:absolute;left:0;width:18px;height:2px;background:rgba(245,246,247,.9);border-radius:2px}
+    .hamburger span::before{top:-6px}
+    .hamburger span::after{top:6px}
+
+    .mobile-menu{
+      position: fixed;
+      top: 70px;
+      right: var(--pad);
+      left: var(--pad);
+      z-index: 60;
+      border-radius: 22px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(10,12,15,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow);
+      padding: 10px;
+      transform: translateY(-6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+    }
+    .mobile-menu.open{opacity:1; transform: translateY(0); pointer-events:auto}
+    .mobile-menu a{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 14px;
+      text-decoration:none;
+      color: var(--fg);
+      border-radius: 16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      font-size:12px;
+    }
+    .mobile-menu a + a{margin-top:10px}
+    .mobile-menu a:hover{background: rgba(255,255,255,.08)}
+
+    @media (max-width: 700px){
+      header{padding:12px var(--pad)}
+      .links{display:none}
+      .hamburger{display:inline-flex}
+    }
+
+    /* Hero */
+    .card{
+      width:min(var(--max), 100%);
+      padding:clamp(18px, 3vw, 30px);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(14,16,22,.62), rgba(14,16,22,.38));
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow:var(--shadow);
+      position:relative;
+      z-index:1;
+    }
+    #content{
+      background:none;
+      border:none;
+      box-shadow:none;
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+      padding:0;
+    }
+    h1{margin:0;font-weight:600;line-height:1.05;letter-spacing:-0.02em;font-size: clamp(34px, 5.2vw, 62px)}
+
+    /* Horizontal scroll sections */
+    .hscroll{position:relative;height:200vh;overflow:clip;isolation:isolate}
+    .hsticky{position:sticky;top:0;height:100vh}
+    .hscroll::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(1200px 900px at 20% 10%, rgba(0,0,0,.25), transparent 55%),
+        linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.12) 45%, rgba(0,0,0,.55));
+      z-index:2;
+      pointer-events:none;
+    }
+    .htrack{position:absolute;inset:0;height:100vh;display:flex;width:200vw;transform:translate3d(0,0,0);will-change:transform;z-index:0}
+    .hitem{width:100vw;height:100vh;position:relative;flex:0 0 100vw}
+    .hitem .bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transform:translateZ(0)}
+
+    .hlabel{position:absolute;left:0;right:0;bottom:0;padding:var(--pad);display:flex;justify-content:center;align-items:flex-end;z-index:3;pointer-events:auto}
+    .work-trigger{appearance:none;border:none;background:transparent;padding:0;margin:0;color:var(--fg);font:inherit;cursor:pointer;letter-spacing:inherit;line-height:inherit}
+    .work-trigger:focus{outline:none}
+
+    /* Swiss-glass popover (Story details) */
+    .popover{
+      position:fixed;
+      z-index:80;
+      max-width: min(420px, calc(100vw - 24px));
+      padding: 18px 18px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,12,15,.40);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 16px 50px rgba(0,0,0,.45);
+      color: rgba(245,246,247,.92);
+      opacity: 0;
+      transform: translate3d(0, 6px, 0);
+      pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+    }
+    .popover.open{opacity:1;transform: translate3d(0,0,0);pointer-events:auto}
+    .popover .title{font-weight:620;letter-spacing:.04em;font-size:13px;margin:0 0 8px 0;color:rgba(245,246,247,.96)}
+    .popover .line{font-size:12px;letter-spacing:.06em;color:rgba(245,246,247,.78);margin:0 0 12px 0}
+    .popover .hair{height:1px;background:rgba(255,255,255,.12);margin:10px 0}
+    .popover .meta{font-size:12px;letter-spacing:.06em;color:rgba(245,246,247,.78);margin:0 0 12px 0}
+    .popover .meta b{color:rgba(245,246,247,.92);font-weight:620}
+
+    /* Blog section */
+    .blog{align-items:stretch}
+    .panel.blog{padding:0}
+    .blog::before{display:none}
+
+    .old-paper{
+      background-color:#e6d2b5;
+      background-image:
+        radial-gradient(1200px 800px at 20% 10%, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(900px 700px at 80% 30%, rgba(0,0,0,.08), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,.12), rgba(0,0,0,.08));
+      filter: saturate(.95) contrast(.95);
+    }
+
+    .blog-title{
+      position:absolute;
+      top: var(--pad);
+      left:50%;
+      transform: translateX(-50%);
+      z-index: 3;
+      font-weight: 750;
+      letter-spacing: .26em;
+      text-transform: uppercase;
+      font-size: 14px;
+      margin:0;
+      color: rgba(11,12,15,.72);
+    }
+
+    .blog-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;padding:0}
+
+    .blog-carousel{
+      width:100vw;
+      display:flex;
+      gap: var(--blog-gap);
+      overflow-x:auto;
+      overflow-y:hidden;
+      scroll-snap-type: x mandatory;
+      scroll-snap-stop: always;
+      scroll-behavior: smooth;
+      padding-left: calc(50vw - (var(--blog-card-w) / 2));
+      padding-right: calc(50vw - (var(--blog-card-w) / 2));
+      scroll-padding-left: calc(50vw - (var(--blog-card-w) / 2));
+      scroll-padding-right: calc(50vw - (var(--blog-card-w) / 2));
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .blog-carousel::-webkit-scrollbar{display:none}
+
+    .blog-card{
+      flex: 0 0 var(--blog-card-w);
+      scroll-snap-align: center;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(10,12,15,.38);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: none;
+      padding: 22px 22px 20px;
+      min-height: 300px;
+      display:flex;
+      flex-direction:column;
+      color: rgba(245,246,247,.92);
+    }
+
+    .blog-card h3{margin:0 0 8px 0;font-size:14px;letter-spacing:.06em;font-weight:700}
+    .blog-card .byline{margin:0 0 14px 0;font-size:12px;letter-spacing:.04em;color: rgba(245,246,247,.68)}
+    .blog-card .headline{margin:0 0 10px 0;font-size:13px;line-height:1.5;font-weight:720;letter-spacing:.04em}
+    .blog-card .snippet{margin:0;font-size:13px;line-height:1.6;color: rgba(245,246,247,.78);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .blog-card .bottom{margin-top:auto}
+
+    .blog-next,.blog-prev{
+      position:absolute;
+      bottom: var(--pad);
+      z-index: 4;
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(10,12,15,.18);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: rgba(245,246,247,.92);
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      transition: transform .15s ease, background .2s ease, border-color .2s ease;
+    }
+    .blog-next{right: var(--pad)}
+    .blog-prev{left: var(--pad)}
+    .blog-next:hover,.blog-prev:hover{background: rgba(10,12,15,.28); border-color: rgba(255,255,255,.26)}
+    .blog-next:active,.blog-prev:active{transform: translateY(1px)}
+    .blog-prev[hidden]{display:none}
+
+    .blog-next.all{
+      width:auto;
+      padding: 0 16px;
+      height: 46px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      cursor: default;
+    }
+
+    /* Contact (half-height) */
+    .half-panel{min-height:50vh;align-items:center;padding: var(--pad)}
+    .half-panel::before{display:none}
+
+    .contact-card{
+      width:min(var(--max), 100%);
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(10,12,15,.32);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 18px 60px rgba(0,0,0,.35);
+      padding: clamp(18px, 3vw, 30px);
+      position:relative;
+      z-index:2;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 18px;
+    }
+
+    .kicker{margin:0 0 10px 0;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color: rgba(245,246,247,.72);font-weight: 650}
+    .contact-title{margin:0;font-weight:560;line-height:1.1;letter-spacing:-0.02em;font-size: clamp(26px, 4vw, 42px)}
+
+    .social{display:flex;gap: 10px;align-items:center;justify-content:flex-end;padding-bottom: 4px}
+
+    .icon-btn{
+      width:42px;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      text-decoration:none;
+      color: rgba(245,246,247,.92);
+      transition: background .2s ease, border-color .2s ease, transform .15s ease;
+    }
+    .icon-btn:hover{background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.22)}
+    .icon-btn:active{transform: translateY(1px)}
+    .icon-btn svg{width:18px;height:18px;display:block}
+
+    /* Accessibility */
+    .skip{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip:focus{left:var(--pad);top:12px;width:auto;height:auto;padding:10px 12px;border-radius:999px;background:rgba(245,246,247,.92);color:#0b0c0f;z-index:100}
+  </style>
+</head>
+<body>
+  <a class="skip" href="#content">Skip to content</a>
+
+  <header id="siteHeader">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="#top"><span>fahadABIR</span></a>
+
+      <div class="links" aria-label="Desktop links">
+        <a href="#work">Work</a>
+        <a href="#blog">Blog</a>
+        <a href="#contact">Contact</a>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+      </button>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
+      <a href="#work">Work</a>
+      <a href="#blog">Blog</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- HERO -->
+    <section class="panel" aria-label="Hero">
+      <div class="bg" style="background-image:url('assets/hero.jpg')"></div>
+      <div class="card" id="content">
+        <h1>Quiet images.<br/>Loud feelings.</h1>
+      </div>
+    </section>
+
+    <!-- WORK 1/2 -->
+    <section class="hscroll" id="work" aria-label="Work">
+      <div class="hsticky">
+        <div class="htrack" id="workTrack" aria-hidden="true">
+          <div class="hitem"><div class="bg" style="background-image:url('assets/work.jpg')"></div></div>
+          <div class="hitem"><div class="bg" style="background:#bbe4e9"></div></div>
+        </div>
+        <div class="hlabel" aria-label="Work label">
+          <button class="work-trigger" id="workLabel" type="button" aria-label="Open Story details">Story</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK 3/4 (reverse) -->
+    <section class="hscroll" id="work3" aria-label="Work 3">
+      <div class="hsticky">
+        <div class="htrack" id="workTrackB" aria-hidden="true">
+          <div class="hitem"><div class="bg" style="background:#bbe4e9"></div></div>
+          <div class="hitem"><div class="bg" style="background:#09252d"></div></div>
+        </div>
+        <div class="hlabel" aria-label="Work 3 label">
+          <button class="work-trigger" id="workLabelB" type="button" aria-label="Open Story details">Story</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- BLOG -->
+    <section class="panel blog" id="blog" aria-label="Blog">
+      <div class="bg old-paper"></div>
+      <h2 class="blog-title">BLOG</h2>
+
+      <div class="blog-stage">
+        <div class="blog-carousel" id="blogCarousel" aria-label="Blog carousel">
+          <article class="blog-card" aria-label="Blog 1">
+            <h3>Blog 1</h3>
+            <p class="byline">Abir Hossain | December 5, 2025</p>
+            <div class="bottom">
+              <p class="headline">A quiet drive through Monaco</p>
+              <p class="snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.....</p>
+            </div>
+          </article>
+
+          <article class="blog-card" aria-label="Blog 2">
+            <h3>Blog 2</h3>
+            <p class="byline">Abir Hossain | December 5, 2025</p>
+            <div class="bottom">
+              <p class="headline">Light, shadow, and the frame</p>
+              <p class="snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.....</p>
+            </div>
+          </article>
+
+          <article class="blog-card" aria-label="Blog 3">
+            <h3>Blog 3</h3>
+            <p class="byline">Abir Hossain | December 5, 2025</p>
+            <div class="bottom">
+              <p class="headline">Silence between the moments</p>
+              <p class="snippet">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.....</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <button class="blog-prev" id="blogPrev" type="button" aria-label="Previous blog" hidden>&lt;</button>
+      <button class="blog-next" id="blogNext" type="button" aria-label="Next blog">&gt;</button>
+    </section>
+
+    <!-- CONTACT (half-height) -->
+    <section class="panel half-panel" id="contact" aria-label="Contact">
+      <div class="bg" style="background:#0b0c0f"></div>
+      <div class="contact-card">
+        <div>
+          <p class="kicker">Contact</p>
+          <h2 class="contact-title">a Journey,<br/>with Story.</h2>
+        </div>
+
+        <div class="social" aria-label="Social links">
+          <a class="icon-btn" href="https://www.instagram.com/fahad.abir/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M17.5 6.7h.01" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <a class="icon-btn" href="https://www.facebook.com/fahadmahamud.abir/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 8h3V5h-3c-2.2 0-4 1.8-4 4v3H7v3h3v7h3v-7h3l1-3h-4V9c0-.6.4-1 1-1Z" fill="currentColor"/>
+            </svg>
+          </a>
+          <a class="icon-btn" href="https://abirh.net/" target="_blank" rel="noopener noreferrer" aria-label="Website">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10Z" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M2 12h20" stroke="currentColor" stroke-width="1.6"/>
+              <path d="M12 2c2.8 2.7 4.4 6.4 4.4 10S14.8 19.3 12 22c-2.8-2.7-4.4-6.4-4.4-10S9.2 4.7 12 2Z" stroke="currentColor" stroke-width="1.6"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // Navbar: hide on scroll down, show only on scroll up
+    const header = document.getElementById('siteHeader');
+    let lastY = window.scrollY;
+    let ticking = false;
+
+    function onNavScroll(){
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (delta > 8 && y > 80) {
+        header.classList.add('is-hidden');
+        closeMenu();
+      } else if (delta < -8) {
+        header.classList.remove('is-hidden');
+      }
+      lastY = y;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        window.requestAnimationFrame(onNavScroll);
+        ticking = true;
+      }
+    }, { passive:true });
+
+    // Mobile hamburger
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
+
+    function openMenu(){
+      mobileMenu.classList.add('open');
+      hamburger.setAttribute('aria-expanded','true');
+      hamburger.setAttribute('aria-label','Close menu');
+    }
+    function closeMenu(){
+      mobileMenu.classList.remove('open');
+      hamburger.setAttribute('aria-expanded','false');
+      hamburger.setAttribute('aria-label','Open menu');
+    }
+    function toggleMenu(){
+      mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
+    }
+
+    hamburger.addEventListener('click', (e) => {
+      e.preventDefault();
+      toggleMenu();
+    });
+
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMenu()));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!isPhone()) return;
+      if (!mobileMenu.classList.contains('open')) return;
+      const within = mobileMenu.contains(e.target) || hamburger.contains(e.target);
+      if (!within) closeMenu();
+    });
+
+    // Horizontal scrollers (Stories 1-4)
+    function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+    function setupHScroll({ sectionId, trackId, labelId, labels, reverse, baseStoryId }){
+      const section = document.getElementById(sectionId);
+      const track = document.getElementById(trackId);
+      const labelEl = document.getElementById(labelId);
+      if (!section || !track || !labelEl) return null;
+
+      let targetX = 0;
+      let currentX = 0;
+      let raf = null;
+
+      function size(){
+        const panels = track.children.length;
+        track.style.width = (panels * 100) + 'vw';
+        section.style.height = (panels * 100) + 'vh';
+      }
+
+      function visibleIndex(progress, panels){
+        const idx = reverse
+          ? Math.round((1 - progress) * (panels - 1))
+          : Math.round(progress * (panels - 1));
+        return Math.max(0, Math.min(panels - 1, idx));
+      }
+
+      function compute(){
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const panels = track.children.length;
+        const maxX = (panels - 1) * window.innerWidth;
+
+        const denom = Math.max(1, (rect.height - vh));
+        const progress = clamp01((0 - rect.top) / denom);
+        targetX = reverse ? (1 - progress) * maxX : progress * maxX;
+
+        const idx = visibleIndex(progress, panels);
+        const labelText = labels[idx] ?? labels[0] ?? 'Story';
+        labelEl.textContent = labelText;
+        labelEl.dataset.workLabel = labelText;
+
+        // Map current visible panel -> Story id (1..4)
+        if (typeof baseStoryId === 'number') {
+          labelEl.dataset.storyId = String(baseStoryId + idx);
+        }
+
+        const near = rect.top < vh && rect.bottom > 0;
+        if (near && !raf) animate();
+      }
+
+      function animate(){
+        const ease = 0.12;
+        currentX += (targetX - currentX) * ease;
+        if (Math.abs(targetX - currentX) < 0.25) currentX = targetX;
+
+        track.style.transform = `translate3d(${-currentX}px,0,0)`;
+
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const near = rect.top < vh && rect.bottom > 0;
+        const moving = Math.abs(targetX - currentX) > 0.3;
+        if (near || moving) {
+          raf = requestAnimationFrame(animate);
+          return;
+        }
+        raf = null;
+      }
+
+      size();
+      compute();
+      return { size, compute };
+    }
+
+    // Work section contains Story 1 & 2
+    const scrollerA = setupHScroll({ sectionId:'work', trackId:'workTrack', labelId:'workLabel', labels:['Story','Story'], reverse:false, baseStoryId: 1 });
+    // Work3 section contains Story 3 & 4
+    const scrollerB = setupHScroll({ sectionId:'work3', trackId:'workTrackB', labelId:'workLabelB', labels:['Story','Story'], reverse:true, baseStoryId: 3 });
+
+    function onHScroll(){
+      scrollerA?.compute();
+      scrollerB?.compute();
+    }
+
+    window.addEventListener('scroll', onHScroll, { passive:true });
+
+    // Blog carousel: always center nearest card
+    const blogCarousel = document.getElementById('blogCarousel');
+    const blogNext = document.getElementById('blogNext');
+    const blogPrev = document.getElementById('blogPrev');
+
+    function getBlogStep(){
+      if (!blogCarousel) return 0;
+      const styles = getComputedStyle(document.documentElement);
+      const gap = parseFloat(styles.getPropertyValue('--blog-gap')) || 22;
+      const card = blogCarousel.querySelector('.blog-card');
+      const w = card ? card.getBoundingClientRect().width : 420;
+      return w + gap;
+    }
+
+    function getBlogCount(){
+      return blogCarousel ? blogCarousel.querySelectorAll('.blog-card').length : 0;
+    }
+
+    function getActiveBlogIndex(){
+      if (!blogCarousel) return 0;
+      const step = getBlogStep() || 1;
+      return Math.round(blogCarousel.scrollLeft / step);
+    }
+
+    function updateBlogNav(){
+      if (!blogCarousel || !blogNext || !blogPrev) return;
+      const count = getBlogCount();
+      const idx = getActiveBlogIndex();
+      const atStart = idx <= 0;
+      const atEnd = idx >= count - 1;
+
+      blogPrev.hidden = atStart;
+
+      if (atEnd) {
+        blogNext.classList.add('all');
+        blogNext.textContent = 'All Blogs';
+        blogNext.setAttribute('aria-label','All blogs');
+        blogNext.disabled = true;
+      } else {
+        blogNext.classList.remove('all');
+        blogNext.textContent = '>';
+        blogNext.setAttribute('aria-label','Next blog');
+        blogNext.disabled = false;
+      }
+    }
+
+    function scrollBlogToIndex(nextIdx, immediate){
+      if (!blogCarousel) return;
+      const count = getBlogCount();
+      const idx = Math.max(0, Math.min(count - 1, nextIdx));
+      const step = getBlogStep();
+      blogCarousel.scrollTo({ left: idx * step, behavior: immediate ? 'auto' : 'smooth' });
+    }
+
+    function snapBlogToNearest(immediate){
+      if (!blogCarousel) return;
+      scrollBlogToIndex(getActiveBlogIndex(), !!immediate);
+    }
+
+    blogNext?.addEventListener('click', (e) => {
+      if (blogNext.disabled) return;
+      e.preventDefault();
+      scrollBlogToIndex(getActiveBlogIndex() + 1, false);
+    });
+
+    blogPrev?.addEventListener('click', (e) => {
+      e.preventDefault();
+      scrollBlogToIndex(getActiveBlogIndex() - 1, false);
+    });
+
+    let blogSnapTimer = null;
+    blogCarousel?.addEventListener('scroll', () => {
+      updateBlogNav();
+      clearTimeout(blogSnapTimer);
+      blogSnapTimer = setTimeout(() => {
+        snapBlogToNearest(false);
+      }, 110);
+    }, { passive:true });
+
+    // Floating swiss-glass popover for Stories
+    const popover = document.createElement('div');
+    popover.className = 'popover';
+    popover.setAttribute('role','dialog');
+    popover.setAttribute('aria-label','Story details');
+    popover.innerHTML = `
+      <p class="meta" id="popMeta"></p>
+      <div class="hair"></div>
+      <div class="title" id="popTitle"></div>
+      <div class="line" id="popLocation"></div>
+      <p class="line" id="popBlurb"></p>
+    `;
+    document.body.appendChild(popover);
+
+    const popTitle = popover.querySelector('#popTitle');
+    const popLocation = popover.querySelector('#popLocation');
+    const popMeta = popover.querySelector('#popMeta');
+    const popBlurb = popover.querySelector('#popBlurb');
+
+    // 4 unique story configs
+    const storyDetails = {
+      1: {
+        title: 'Horsepower',
+        location: 'Monaco, FR',
+        focal: '35 mm',
+        iso: '100',
+        shutter: '1/60',
+        f: '1.2',
+        blurb: [
+          'A moment of controlled chaos captured at the edge of motion.',
+          'Where mechanical force meets human intention.'
+        ]
+      },
+      2: {
+        title: 'Midnight Run',
+        location: 'Tokyo, JP',
+        focal: '50 mm',
+        iso: '400',
+        shutter: '1/80',
+        f: '1.4',
+        blurb: [
+          'Neon lights spill across wet asphalt in silence.',
+          'Speed dissolves into rhythm after dark.'
+        ]
+      },
+      3: {
+        title: 'Still Torque',
+        location: 'Alps, CH',
+        focal: '24 mm',
+        iso: '200',
+        shutter: '1/125',
+        f: '2.0',
+        blurb: [
+          'Power rests quietly beneath mountain air.',
+          'A pause before momentum returns.'
+        ]
+      },
+      4: {
+        title: 'Redline',
+        location: 'California, US',
+        focal: '85 mm',
+        iso: '64',
+        shutter: '1/250',
+        f: '1.8',
+        blurb: [
+          'Precision sharpened at the limit of control.',
+          'Every frame pushed to its edge.'
+        ]
+      },
+    };
+
+    let popOpen = false;
+    let currentStoryId = null;
+
+    function closePopover(){
+      popover.classList.remove('open');
+      popOpen = false;
+      currentStoryId = null;
+    }
+
+    function positionPopover(anchorEl){
+      const r = anchorEl.getBoundingClientRect();
+      const pad = 12;
+
+      popover.style.left = '0px';
+      popover.style.top = '0px';
+      popover.classList.add('open');
+
+      const pr = popover.getBoundingClientRect();
+      const cx = r.left + r.width/2;
+
+      let left = cx - pr.width/2;
+      left = Math.max(pad, Math.min(left, window.innerWidth - pr.width - pad));
+
+      let top = r.top - pr.height - 12;
+      if (top < pad) top = r.bottom + 12;
+
+      popover.style.left = left + 'px';
+      popover.style.top = top + 'px';
+    }
+
+    function getStoryIdFor(anchorEl){
+      const raw = anchorEl?.dataset?.storyId;
+      const n = raw ? parseInt(raw, 10) : 1;
+      if (!Number.isFinite(n)) return 1;
+      return Math.max(1, Math.min(4, n));
+    }
+
+    function openPopoverFor(anchorEl){
+      const id = getStoryIdFor(anchorEl);
+      const d = storyDetails[id] || storyDetails[1];
+
+      popMeta.innerHTML = `<b>Focal Length:</b> ${d.focal} &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
+      popTitle.textContent = d.title;
+      popLocation.textContent = d.location;
+      popBlurb.innerHTML = `${d.blurb[0]}<br/>${d.blurb[1]}`;
+
+      positionPopover(anchorEl);
+      popOpen = true;
+      currentStoryId = id;
+    }
+
+    function togglePopover(anchorEl){
+      const nextId = getStoryIdFor(anchorEl);
+      if (popOpen) {
+        if (currentStoryId !== nextId) {
+          openPopoverFor(anchorEl);
+          return;
+        }
+        closePopover();
+        return;
+      }
+      openPopoverFor(anchorEl);
+    }
+
+    const workLabelEl = document.getElementById('workLabel');
+    const workLabelBEl = document.getElementById('workLabelB');
+
+    [workLabelEl, workLabelBEl].filter(Boolean).forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePopover(el);
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!popOpen) return;
+      const within = popover.contains(e.target) || workLabelEl?.contains(e.target) || workLabelBEl?.contains(e.target);
+      if (!within) closePopover();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closePopover();
+        closeMenu();
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (popOpen) closePopover();
+    }, { passive:true });
+
+    window.addEventListener('resize', () => {
+      scrollerA?.size();
+      scrollerB?.size();
+      onHScroll();
+      snapBlogToNearest(true);
+    });
+
+    // Init
+    onHScroll();
+    snapBlogToNearest(true);
+    updateBlogNav();
+
+    // Tiny console tests
+    (function runTests(){
+      const results = [];
+      const assert = (name, condition) => results.push({ name, pass: !!condition });
+
+      assert('Header exists', !!document.getElementById('siteHeader'));
+      assert('Hero content exists', !!document.getElementById('content'));
+
+      assert('Work section exists', !!document.getElementById('work'));
+      assert('Work track exists', !!document.getElementById('workTrack'));
+      assert('Work label exists', document.getElementById('workLabel')?.tagName === 'BUTTON');
+
+      assert('Work3 section exists', !!document.getElementById('work3'));
+      assert('Work3 track exists', !!document.getElementById('workTrackB'));
+      assert('Work3 label exists', document.getElementById('workLabelB')?.tagName === 'BUTTON');
+
+      assert('Blog section exists', !!document.getElementById('blog'));
+      assert('Blog carousel exists', !!document.getElementById('blogCarousel'));
+      assert('Blog has at least 3 cards', (document.querySelectorAll('#blogCarousel .blog-card')?.length ?? 0) >= 3);
+      assert('Blog next exists', !!document.getElementById('blogNext'));
+      assert('Blog prev exists', !!document.getElementById('blogPrev'));
+      assert('No blog modal present', !document.querySelector('.blog-modal'));
+
+      assert('Contact section exists', !!document.getElementById('contact'));
+      assert('Popover injected', !!document.querySelector('.popover'));
+
+      // New tests: storyId mapping is valid (1..4)
+      const w = document.getElementById('workLabel');
+      const wb = document.getElementById('workLabelB');
+      assert('Story id from label A is 1..2', w ? (getStoryIdFor(w) >= 1 && getStoryIdFor(w) <= 2) : false);
+      assert('Story id from label B is 3..4', wb ? (getStoryIdFor(wb) >= 3 && getStoryIdFor(wb) <= 4) : false);
+
+      const failed = results.filter(r => !r.pass);
+      if (failed.length) console.warn('Tests failed:', failed);
+      else console.log('All tests passed');
+    })();
+  </script>
+</body>
+</html>

@@ -17,9 +17,6 @@
 
       --blog-card-w: clamp(340px, 44vw, 560px);
       --blog-gap: 22px;
-
-      /* Work carousel padding: big on desktop, small on phones */
-      --work-pad: clamp(16px, 6vw, 20vh);
     }
 
     *{box-sizing:border-box}
@@ -199,246 +196,55 @@
 
     /* Hero */
     .card{
-      width:min(var(--max), 100%);
-      padding:clamp(18px, 3vw, 30px);
-      border-radius:var(--radius);
-      background: linear-gradient(180deg, rgba(14,16,22,.62), rgba(14,16,22,.38));
-      border:1px solid rgba(255,255,255,.12);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow:var(--shadow);
-      position:relative;
-      z-index:1;
+    width:min(var(--max), 100%);
+    padding:clamp(18px, 3vw, 30px);
+    border-radius:var(--radius);
+    background: linear-gradient(180deg, rgba(14,16,22,.62), rgba(14,16,22,.38));
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow:var(--shadow);
+    position:relative;
+    z-index:1;
     }
     #content{
-      background:none;
-      border:none;
-      box-shadow:none;
-      backdrop-filter:none;
-      -webkit-backdrop-filter:none;
-      padding:0;
+    background:none;
+    border:none;
+    box-shadow:none;
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    padding:0;
     }
 
-    /* Phone + iPad: lift hero text block slightly */
+    /* Phone-only: lift hero text block slightly */
     @media (max-width: 1024px){
-      .panel[aria-label="Hero"]{
+    .panel[aria-label="Hero"]{
         padding-bottom: calc(var(--pad) + 48px);
-      }
+    }
     }
 
     h1{margin:0;font-weight:600;line-height:1.05;letter-spacing:-0.02em;font-size: clamp(34px, 5.2vw, 62px)}
 
-    /* WORK (carousel, full screen) */
-    .panel.work{padding:0}
-    .panel.work::before{display:none}
-
-    .work-stage{
+    /* Horizontal scroll sections */
+    .hscroll{position:relative;height:200vh;overflow:clip;isolation:isolate}
+    .hsticky{position:sticky;top:0;height:100vh}
+    .hscroll::before{
+      content:"";
       position:absolute;
       inset:0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      isolation:isolate;
+      background:
+        radial-gradient(1200px 900px at 20% 10%, rgba(0,0,0,.25), transparent 55%),
+        linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.12) 45%, rgba(0,0,0,.55));
+      z-index:2;
+      pointer-events:none;
     }
+    .htrack{position:absolute;inset:0;height:100vh;display:flex;width:200vw;transform:translate3d(0,0,0);will-change:transform;z-index:0}
+    .hitem{width:100vw;height:100vh;position:relative;flex:0 0 100vw}
+    .hitem .bg{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;transform:translateZ(0)}
 
-    .work-carousel{
-      width:100vw;
-      height:100vh;
-      display:flex;
-      gap: 22px;
-      overflow-x:auto;
-      overflow-y:hidden;
-      scroll-snap-type: x mandatory;
-      scroll-snap-stop: always;
-      scroll-behavior: smooth;
-
-      padding: var(--work-pad);
-
-      scroll-padding-left: var(--work-pad);
-      scroll-padding-right: var(--work-pad);
-
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      outline:none;
-    }
-    .work-carousel::-webkit-scrollbar{display:none}
-
-    .work-card{
-      flex: 0 0 calc(100vw - (var(--work-pad) * 2));
-      height: calc(100vh - (var(--work-pad) * 2));
-      scroll-snap-align: center;
-      border-radius: 22px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(10,12,15,.22);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-      position:relative;
-      overflow:hidden;
-    }
-
-    .work-media{
-      position:absolute;
-      inset:0;
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      transform: translateZ(0);
-    }
-
-    /* Keep “Story” button at bottom center */
-    .hlabel{
-      position:absolute;left:0;right:0;bottom:0;
-      padding:var(--pad);
-      display:flex;
-      justify-content:center;
-      align-items:flex-end;
-      z-index:3;
-      pointer-events:auto;
-    }
+    .hlabel{position:absolute;left:0;right:0;bottom:0;padding:var(--pad);display:flex;justify-content:center;align-items:flex-end;z-index:3;pointer-events:auto}
     .work-trigger{appearance:none;border:none;background:transparent;padding:0;margin:0;color:var(--fg);font:inherit;cursor:pointer;letter-spacing:inherit;line-height:inherit}
     .work-trigger:focus{outline:none}
-
-    /* Arrows bottom-left / bottom-right */
-    .work-next,.work-prev{
-      position:absolute;
-      bottom: var(--pad);
-      z-index: 4;
-      width: 48px;
-      height: 48px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.18);
-      background: rgba(10,12,15,.18);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      color: rgba(245,246,247,.92);
-      cursor: pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 18px;
-      transition: transform .15s ease, background .2s ease, border-color .2s ease;
-    }
-    .work-prev{left: var(--pad)}
-    .work-next{right: var(--pad)}
-    .work-next:hover,.work-prev:hover{background: rgba(10,12,15,.28); border-color: rgba(255,255,255,.26)}
-    .work-next:active,.work-prev:active{transform: translateY(1px)}
-
-    /* Phone + iPad: Reel section 2/3 height + ONE card centered (like blog) */
-    @media (max-width: 1024px){
-      #reel{
-        min-height:67vh;
-        height:67vh;
-        align-items:center; /* override .panel flex-end */
-      }
-
-      #reel .work-stage{
-        align-items:center;
-      }
-
-      /* make carousel behave like blog (one card visible at a time) */
-      #reel .work-carousel{
-        height:67vh;
-        padding-left: calc(50vw - (var(--blog-card-w) / 2));
-        padding-right: calc(50vw - (var(--blog-card-w) / 2));
-        scroll-padding-left: calc(50vw - (var(--blog-card-w) / 2));
-        scroll-padding-right: calc(50vw - (var(--blog-card-w) / 2));
-      }
-
-      #reel .work-card{
-      flex: 0 0 var(--blog-card-w);      /* width */
-      height: var(--blog-card-w);        /* make it square */
-      }
-
-      #reel .work-media{
-      background-position: center center;
-      }
-
-    }
-
-    /* WORK REVEAL (single work, padding collapses, popover slides up) */
-    .work-reveal{
-      height: 240vh;
-      position: relative;
-      isolation: isolate;
-    }
-
-    .work-reveal-sticky{
-      position: sticky;
-      top: 0;
-      height: 100vh;
-      overflow: hidden;
-      isolation: isolate;
-    }
-
-    .work-reveal-frame{
-      position: absolute;
-      inset: 0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-
-      /* 3/5 screen card at start (60%): paddingX=20vw, paddingY=20vh */
-      padding: var(--reveal-pad-y, 20vh) var(--reveal-pad-x, 20vw);
-
-      transition: padding 0.06s linear;
-      z-index: 2;
-    }
-
-    .work-reveal-card{
-      width: 100%;
-      height: 100%;
-      border-radius: var(--reveal-radius, 22px);
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(10,12,15,.22);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-      transition: border-radius 0.08s linear;
-    }
-
-    .work-reveal-media{
-      position:absolute;
-      inset:0;
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      transform: translateZ(0);
-    }
-
-    .work-reveal-pop{
-      position: absolute;
-      left: 50%;
-      bottom: var(--pad);
-      transform: translateX(-50%) translateY(18px);
-      width: min(520px, calc(100vw - 24px));
-      padding: 18px 18px 16px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(10,12,15,.40);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 16px 50px rgba(0,0,0,.45);
-      color: rgba(245,246,247,.92);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity .18s ease, transform .18s ease;
-      z-index: 3;
-    }
-
-    .work-reveal-pop.open{
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-      pointer-events: auto;
-    }
-
-    .work-reveal-pop .title{font-weight:620;letter-spacing:.04em;font-size:13px;margin:0 0 8px 0;color:rgba(245,246,247,.96)}
-    .work-reveal-pop .line{font-size:12px;letter-spacing:.06em;color:rgba(245,246,247,.78);margin:0 0 12px 0}
-    .work-reveal-pop .hair{height:1px;background:rgba(255,255,255,.12);margin:10px 0}
-    .work-reveal-pop .meta{font-size:12px;letter-spacing:.06em;color:rgba(245,246,247,.78);margin:0 0 12px 0}
-    .work-reveal-pop .meta b{color:rgba(245,246,247,.92);font-weight:620}
 
     /* Swiss-glass popover (Story details) */
     .popover{
@@ -470,10 +276,13 @@
     .panel.blog{padding:0}
     .blog::before{display:none}
 
-    /* Phone + iPad: make blog section ~2/3 screen */
+    /* Phone-only: make blog section ~2/3 screen */
     @media (max-width: 1024px){
-      .panel.blog{min-height:67vh}
+    .panel.blog{
+        min-height:67vh;
     }
+    }
+
 
     .old-paper{
       background-color:#e6d2b5;
@@ -496,21 +305,6 @@
       font-size: 14px;
       margin:0;
       color: rgba(11,12,15,.72);
-    }
-
-    /* Reel title: white + centered in top gap on desktop */
-    #reel .blog-title{
-      top: calc(var(--work-pad) / 2);
-      transform: translate(-50%, -50%);
-      color: rgba(245,246,247,.92);
-    }
-
-    /* Reel title on Phone+iPad: keep it near top (clean with 67vh layout) */
-    @media (max-width: 1024px){
-      #reel .blog-title{
-        top: calc(var(--pad) + 6px);
-        transform: translateX(-50%);
-      }
     }
 
     .blog-stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:2;padding:0}
@@ -593,16 +387,19 @@
 
     /* Contact (half-height) */
     .half-panel{
-      min-height:50vh;
-      align-items:center;
-      padding: var(--pad);
+    min-height:50vh;
+    align-items:center;
+    padding: var(--pad);
     }
     .half-panel::before{display:none}
 
-    /* Phone + iPad: make contact section ~1/3 screen */
+    /* Phone-only: make contact section ~1/3 screen */
     @media (max-width: 1024px){
-      .half-panel{min-height:33vh}
+    .half-panel{
+        min-height:33vh;
     }
+    }
+
 
     .contact-card{
       width:min(var(--max), 100%);
@@ -650,7 +447,6 @@
     .skip:focus{left:var(--pad);top:12px;width:auto;height:auto;padding:10px 12px;border-radius:999px;background:rgba(245,246,247,.92);color:#0b0c0f;z-index:100}
   </style>
 </head>
-
 <body>
   <a class="skip" href="#content">Skip to content</a>
 
@@ -659,7 +455,7 @@
       <a class="brand" href="#top"><span>fahadABIR</span></a>
 
       <div class="links" aria-label="Desktop links">
-        <a href="#reel">Reel</a>
+        <a href="#work">Work</a>
         <a href="#blog">Blog</a>
         <a href="#contact">Contact</a>
       </div>
@@ -670,7 +466,7 @@
     </nav>
 
     <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
-      <a href="#reel">Reel</a>
+      <a href="#work">Work</a>
       <a href="#blog">Blog</a>
       <a href="#contact">Contact</a>
     </div>
@@ -685,78 +481,29 @@
       </div>
     </section>
 
-    <!-- WORK REVEAL 1 -->
-    <section class="work-reveal" id="workReveal" aria-label="Work Reveal">
-      <div class="work-reveal-sticky">
-        <div class="bg" style="background:#001829"></div>
-
-        <div class="work-reveal-frame" id="workRevealFrame">
-          <article class="work-reveal-card" aria-label="Featured Work">
-            <div class="work-reveal-media" style="background-image:url('assets/work.jpg')"></div>
-          </article>
+    <!-- WORK 1/2 -->
+    <section class="hscroll" id="work" aria-label="Work">
+      <div class="hsticky">
+        <div class="htrack" id="workTrack" aria-hidden="true">
+          <div class="hitem"><div class="bg" style="background-image:url('assets/work.jpg')"></div></div>
+          <div class="hitem"><div class="bg" style="background-image:url('assets/work2.jpg')"></div></div>
         </div>
-
-        <div class="work-reveal-pop" id="workRevealPop" role="dialog" aria-label="Story details">
-          <p class="meta" id="revealMeta"></p>
-          <div class="hair"></div>
-          <div class="title" id="revealTitle"></div>
-          <div class="line" id="revealLocation"></div>
-          <p class="line" id="revealBlurb"></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- WORK REVEAL 2 -->
-    <section class="work-reveal" id="workReveal2" aria-label="Work Reveal 2">
-      <div class="work-reveal-sticky">
-        <div class="bg" style="background:#001829"></div>
-
-        <div class="work-reveal-frame" id="workRevealFrame2">
-          <article class="work-reveal-card" aria-label="Featured Work 2">
-            <div class="work-reveal-media" style="background-image:url('assets/work2.jpg')"></div>
-          </article>
-        </div>
-
-        <div class="work-reveal-pop" id="workRevealPop2" role="dialog" aria-label="Story details">
-          <p class="meta" id="revealMeta2"></p>
-          <div class="hair"></div>
-          <div class="title" id="revealTitle2"></div>
-          <div class="line" id="revealLocation2"></div>
-          <p class="line" id="revealBlurb2"></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- REEL (ROLL THE REEL)(carousel: 4 items) -->
-    <section class="panel work" id="reel" aria-label="Reel">
-      <div class="bg" style="background:#001829"></div>
-      <h2 class="blog-title"></h2>
-
-      <div class="work-stage" aria-label="Work carousel stage">
-        <div class="work-carousel" id="workCarousel" aria-label="Work carousel" tabindex="0">
-          <article class="work-card" aria-label="Work 1">
-            <div class="work-media" style="background-image:url('assets/work.jpg')"></div>
-          </article>
-
-          <article class="work-card" aria-label="Work 2">
-            <div class="work-media" style="background-image:url('assets/work2.jpg')"></div>
-          </article>
-
-          <article class="work-card" aria-label="Work 3">
-            <div class="work-media" style="background:#bbe4e9"></div>
-          </article>
-
-          <article class="work-card" aria-label="Work 4">
-            <div class="work-media" style="background:#09252d"></div>
-          </article>
-        </div>
-
         <div class="hlabel" aria-label="Work label">
           <button class="work-trigger" id="workLabel" type="button" aria-label="Open Story details">Story</button>
         </div>
+      </div>
+    </section>
 
-        <button class="work-prev" id="workPrev" type="button" aria-label="Previous work">&lt;</button>
-        <button class="work-next" id="workNext" type="button" aria-label="Next work">&gt;</button>
+    <!-- WORK 3/4 (reverse) -->
+    <section class="hscroll" id="work3" aria-label="Work 3">
+      <div class="hsticky">
+        <div class="htrack" id="workTrackB" aria-hidden="true">
+          <div class="hitem"><div class="bg" style="background:#bbe4e9"></div></div>
+          <div class="hitem"><div class="bg" style="background:#09252d"></div></div>
+        </div>
+        <div class="hlabel" aria-label="Work 3 label">
+          <button class="work-trigger" id="workLabelB" type="button" aria-label="Open Story details">Story</button>
+        </div>
       </div>
     </section>
 
@@ -800,7 +547,7 @@
       <button class="blog-next" id="blogNext" type="button" aria-label="Next blog">&gt;</button>
     </section>
 
-    <!-- CONTACT -->
+    <!-- CONTACT (half-height) -->
     <section class="panel half-panel" id="contact" aria-label="Contact">
       <div class="bg" style="background:#0b0c0f"></div>
       <div class="contact-card">
@@ -832,6 +579,7 @@
         </div>
       </div>
     </section>
+
   </main>
 
   <script>
@@ -844,11 +592,10 @@
       const y = window.scrollY;
       const delta = y - lastY;
       if (delta > 8 && y > 80) {
-        header?.classList.add('is-hidden');
+        header.classList.add('is-hidden');
         closeMenu();
-        closePopover();
       } else if (delta < -8) {
-        header?.classList.remove('is-hidden');
+        header.classList.remove('is-hidden');
       }
       lastY = y;
       ticking = false;
@@ -867,37 +614,123 @@
     const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
 
     function openMenu(){
-      if (!mobileMenu || !hamburger) return;
       mobileMenu.classList.add('open');
       hamburger.setAttribute('aria-expanded','true');
       hamburger.setAttribute('aria-label','Close menu');
     }
     function closeMenu(){
-      if (!mobileMenu || !hamburger) return;
       mobileMenu.classList.remove('open');
       hamburger.setAttribute('aria-expanded','false');
       hamburger.setAttribute('aria-label','Open menu');
     }
     function toggleMenu(){
-      if (!mobileMenu) return;
       mobileMenu.classList.contains('open') ? closeMenu() : openMenu();
     }
 
-    hamburger?.addEventListener('click', (e) => {
+    hamburger.addEventListener('click', (e) => {
       e.preventDefault();
       toggleMenu();
     });
 
-    mobileMenu?.querySelectorAll('a')?.forEach(a => a.addEventListener('click', () => closeMenu()));
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMenu()));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMenu();
+    });
 
     document.addEventListener('click', (e) => {
       if (!isPhone()) return;
-      if (!mobileMenu?.classList.contains('open')) return;
-      const within = mobileMenu.contains(e.target) || hamburger?.contains(e.target);
+      if (!mobileMenu.classList.contains('open')) return;
+      const within = mobileMenu.contains(e.target) || hamburger.contains(e.target);
       if (!within) closeMenu();
     });
 
-    // BLOG carousel
+    // Horizontal scrollers (Stories 1-4)
+    function clamp01(v){ return Math.max(0, Math.min(1, v)); }
+
+    function setupHScroll({ sectionId, trackId, labelId, labels, reverse, baseStoryId }){
+      const section = document.getElementById(sectionId);
+      const track = document.getElementById(trackId);
+      const labelEl = document.getElementById(labelId);
+      if (!section || !track || !labelEl) return null;
+
+      let targetX = 0;
+      let currentX = 0;
+      let raf = null;
+
+      function size(){
+        const panels = track.children.length;
+        track.style.width = (panels * 100) + 'vw';
+        section.style.height = (panels * 100) + 'vh';
+      }
+
+      function visibleIndex(progress, panels){
+        const idx = reverse
+          ? Math.round((1 - progress) * (panels - 1))
+          : Math.round(progress * (panels - 1));
+        return Math.max(0, Math.min(panels - 1, idx));
+      }
+
+      function compute(){
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const panels = track.children.length;
+        const maxX = (panels - 1) * window.innerWidth;
+
+        const denom = Math.max(1, (rect.height - vh));
+        const progress = clamp01((0 - rect.top) / denom);
+        targetX = reverse ? (1 - progress) * maxX : progress * maxX;
+
+        const idx = visibleIndex(progress, panels);
+        const labelText = labels[idx] ?? labels[0] ?? 'Story';
+        labelEl.textContent = labelText;
+        labelEl.dataset.workLabel = labelText;
+
+        // Map current visible panel -> Story id (1..4)
+        if (typeof baseStoryId === 'number') {
+          labelEl.dataset.storyId = String(baseStoryId + idx);
+        }
+
+        const near = rect.top < vh && rect.bottom > 0;
+        if (near && !raf) animate();
+      }
+
+      function animate(){
+        const ease = 0.12;
+        currentX += (targetX - currentX) * ease;
+        if (Math.abs(targetX - currentX) < 0.25) currentX = targetX;
+
+        track.style.transform = `translate3d(${-currentX}px,0,0)`;
+
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const near = rect.top < vh && rect.bottom > 0;
+        const moving = Math.abs(targetX - currentX) > 0.3;
+        if (near || moving) {
+          raf = requestAnimationFrame(animate);
+          return;
+        }
+        raf = null;
+      }
+
+      size();
+      compute();
+      return { size, compute };
+    }
+
+    // Work section contains Story 1 & 2
+    const scrollerA = setupHScroll({ sectionId:'work', trackId:'workTrack', labelId:'workLabel', labels:['Story','Story'], reverse:false, baseStoryId: 1 });
+    // Work3 section contains Story 3 & 4
+    const scrollerB = setupHScroll({ sectionId:'work3', trackId:'workTrackB', labelId:'workLabelB', labels:['Story','Story'], reverse:true, baseStoryId: 3 });
+
+    function onHScroll(){
+      scrollerA?.compute();
+      scrollerB?.compute();
+    }
+
+    window.addEventListener('scroll', onHScroll, { passive:true });
+
+    // Blog carousel: always center nearest card
     const blogCarousel = document.getElementById('blogCarousel');
     const blogNext = document.getElementById('blogNext');
     const blogPrev = document.getElementById('blogPrev');
@@ -976,68 +809,7 @@
       }, 110);
     }, { passive:true });
 
-    // WORK carousel
-    const workCarousel = document.getElementById('workCarousel');
-    const workNext = document.getElementById('workNext');
-    const workPrev = document.getElementById('workPrev');
-    const workLabelEl = document.getElementById('workLabel');
-
-    function getWorkStep(){
-      if (!workCarousel) return 0;
-      const gap = 22;
-      const card = workCarousel.querySelector('.work-card');
-      const w = card ? card.getBoundingClientRect().width : window.innerWidth;
-      return w + gap;
-    }
-
-    function getWorkCount(){
-      return workCarousel ? workCarousel.querySelectorAll('.work-card').length : 0;
-    }
-
-    function getActiveWorkIndex(){
-      if (!workCarousel) return 0;
-      const step = getWorkStep() || 1;
-      return Math.round(workCarousel.scrollLeft / step);
-    }
-
-    function scrollWorkToIndex(nextIdx, immediate){
-      if (!workCarousel) return;
-      const count = getWorkCount();
-      const idx = Math.max(0, Math.min(count - 1, nextIdx));
-      const step = getWorkStep();
-      workCarousel.scrollTo({ left: idx * step, behavior: immediate ? 'auto' : 'smooth' });
-
-      if (workLabelEl) workLabelEl.dataset.storyId = String(idx + 1);
-    }
-
-    function snapWorkToNearest(immediate){
-      scrollWorkToIndex(getActiveWorkIndex(), !!immediate);
-    }
-
-    workNext?.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollWorkToIndex(getActiveWorkIndex() + 1, false);
-    });
-
-    workPrev?.addEventListener('click', (e) => {
-      e.preventDefault();
-      scrollWorkToIndex(getActiveWorkIndex() - 1, false);
-    });
-
-    let workSnapTimer = null;
-    workCarousel?.addEventListener('scroll', () => {
-      const idx = getActiveWorkIndex();
-      if (workLabelEl) workLabelEl.dataset.storyId = String(idx + 1);
-      clearTimeout(workSnapTimer);
-      workSnapTimer = setTimeout(() => snapWorkToNearest(false), 110);
-    }, { passive:true });
-
-    workCarousel?.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() + 1, false); }
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() - 1, false); }
-    });
-
-    // Floating swiss-glass popover (Story details) for Work carousel "Story"
+    // Floating swiss-glass popover for Stories
     const popover = document.createElement('div');
     popover.className = 'popover';
     popover.setAttribute('role','dialog');
@@ -1172,15 +944,20 @@
       openPopoverFor(anchorEl);
     }
 
-    workLabelEl?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      togglePopover(workLabelEl);
+    const workLabelEl = document.getElementById('workLabel');
+    const workLabelBEl = document.getElementById('workLabelB');
+
+    [workLabelEl, workLabelBEl].filter(Boolean).forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePopover(el);
+      });
     });
 
     document.addEventListener('click', (e) => {
       if (!popOpen) return;
-      const within = popover.contains(e.target) || workLabelEl?.contains(e.target);
+      const within = popover.contains(e.target) || workLabelEl?.contains(e.target) || workLabelBEl?.contains(e.target);
       if (!within) closePopover();
     });
 
@@ -1195,149 +972,54 @@
       if (popOpen) closePopover();
     }, { passive:true });
 
-    // WORK REVEAL controllers (supports multiple reveal sections)
-    function clamp01(v){ return Math.max(0, Math.min(1, v)); }
-
-    function setRevealPopover({ storyId, metaEl, titleEl, locationEl, blurbEl }){
-      const d = storyDetails[storyId] || storyDetails[1];
-      if (metaEl) {
-        metaEl.innerHTML = `<b>Focal Length:</b> ${d.focal} &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
-      }
-      if (titleEl) titleEl.textContent = d.title;
-      if (locationEl) locationEl.textContent = d.location;
-      if (blurbEl) blurbEl.innerHTML = `${d.blurb[0]}<br/>${d.blurb[1]}`;
-    }
-
-    function makeWorkRevealController(cfg){
-      const {
-        sectionId,
-        frameId,
-        popId,
-        metaId,
-        titleId,
-        locationId,
-        blurbId,
-        storyId = 1,
-        collapseEnd = 0.60,
-        holdEnd = 0.80,
-        startPadXvw = 20,
-        startPadYvh = 20,
-      } = cfg;
-
-      const section = document.getElementById(sectionId);
-      const frame = document.getElementById(frameId);
-      const pop = document.getElementById(popId);
-
-      const metaEl = document.getElementById(metaId);
-      const titleEl = document.getElementById(titleId);
-      const locationEl = document.getElementById(locationId);
-      const blurbEl = document.getElementById(blurbId);
-
-      if (!section || !frame || !pop) return null;
-
-      setRevealPopover({ storyId, metaEl, titleEl, locationEl, blurbEl });
-
-      let raf = null;
-      let isOpen = false;
-
-      function update(){
-        const rect = section.getBoundingClientRect();
-        const vh = window.innerHeight;
-
-        const total = Math.max(1, rect.height - vh);
-        const p = clamp01((0 - rect.top) / total);
-
-        let padX = 0;
-        let padY = 0;
-
-        if (p <= collapseEnd){
-          const t = p / collapseEnd; // 0..1
-          padX = startPadXvw * (1 - t); // 20vw -> 0
-          padY = startPadYvh * (1 - t); // 20vh -> 0
-        }
-
-        frame.style.setProperty('--reveal-pad-x', `${padX}vw`);
-        frame.style.setProperty('--reveal-pad-y', `${padY}vh`);
-
-        // Radius: start -> 0 during collapse
-        let radius = 0;
-        if (p <= collapseEnd){
-          const t = p / collapseEnd; // 0..1
-          radius = 32 * (1 - t);
-        }
-        frame.firstElementChild?.style.setProperty('--reveal-radius', `${radius}px`);
-
-        const shouldOpen = (p >= collapseEnd && p <= holdEnd);
-        if (shouldOpen && !isOpen){
-          pop.classList.add('open');
-          isOpen = true;
-        } else if (!shouldOpen && isOpen){
-          pop.classList.remove('open');
-          isOpen = false;
-        }
-
-        raf = null;
-      }
-
-      function schedule(){
-        if (raf) return;
-        raf = requestAnimationFrame(update);
-      }
-
-      function close(){
-        if (isOpen) pop.classList.remove('open');
-        isOpen = false;
-      }
-
-      schedule();
-      return { schedule, close };
-    }
-
-    const revealControllers = [
-      makeWorkRevealController({
-        sectionId: 'workReveal',
-        frameId: 'workRevealFrame',
-        popId: 'workRevealPop',
-        metaId: 'revealMeta',
-        titleId: 'revealTitle',
-        locationId: 'revealLocation',
-        blurbId: 'revealBlurb',
-        storyId: 1,
-        startPadXvw: 20,
-        startPadYvh: 20,
-      }),
-      makeWorkRevealController({
-        sectionId: 'workReveal2',
-        frameId: 'workRevealFrame2',
-        popId: 'workRevealPop2',
-        metaId: 'revealMeta2',
-        titleId: 'revealTitle2',
-        locationId: 'revealLocation2',
-        blurbId: 'revealBlurb2',
-        storyId: 2,
-        startPadXvw: 20,
-        startPadYvh: 20,
-      }),
-    ].filter(Boolean);
-
-    function scheduleAllReveals(){ revealControllers.forEach(c => c.schedule()); }
-    function closeAllReveals(){ revealControllers.forEach(c => c.close()); }
-
-    window.addEventListener('scroll', scheduleAllReveals, { passive:true });
-
     window.addEventListener('resize', () => {
-      closePopover();
-      closeAllReveals();
-      snapWorkToNearest(true);
+      scrollerA?.size();
+      scrollerB?.size();
+      onHScroll();
       snapBlogToNearest(true);
-      scheduleAllReveals();
-    }, { passive:true });
+    });
 
     // Init
-    scrollWorkToIndex(0, true);
+    onHScroll();
     snapBlogToNearest(true);
     updateBlogNav();
-    scheduleAllReveals();
+
+    // Tiny console tests
+    (function runTests(){
+      const results = [];
+      const assert = (name, condition) => results.push({ name, pass: !!condition });
+
+      assert('Header exists', !!document.getElementById('siteHeader'));
+      assert('Hero content exists', !!document.getElementById('content'));
+
+      assert('Work section exists', !!document.getElementById('work'));
+      assert('Work track exists', !!document.getElementById('workTrack'));
+      assert('Work label exists', document.getElementById('workLabel')?.tagName === 'BUTTON');
+
+      assert('Work3 section exists', !!document.getElementById('work3'));
+      assert('Work3 track exists', !!document.getElementById('workTrackB'));
+      assert('Work3 label exists', document.getElementById('workLabelB')?.tagName === 'BUTTON');
+
+      assert('Blog section exists', !!document.getElementById('blog'));
+      assert('Blog carousel exists', !!document.getElementById('blogCarousel'));
+      assert('Blog has at least 3 cards', (document.querySelectorAll('#blogCarousel .blog-card')?.length ?? 0) >= 3);
+      assert('Blog next exists', !!document.getElementById('blogNext'));
+      assert('Blog prev exists', !!document.getElementById('blogPrev'));
+      assert('No blog modal present', !document.querySelector('.blog-modal'));
+
+      assert('Contact section exists', !!document.getElementById('contact'));
+      assert('Popover injected', !!document.querySelector('.popover'));
+
+      // New tests: storyId mapping is valid (1..4)
+      const w = document.getElementById('workLabel');
+      const wb = document.getElementById('workLabelB');
+      assert('Story id from label A is 1..2', w ? (getStoryIdFor(w) >= 1 && getStoryIdFor(w) <= 2) : false);
+      assert('Story id from label B is 3..4', wb ? (getStoryIdFor(wb) >= 3 && getStoryIdFor(wb) <= 4) : false);
+
+      const failed = results.filter(r => !r.pass);
+      if (failed.length) console.warn('Tests failed:', failed);
+      else console.log('All tests passed');
+    })();
   </script>
 </body>
 </html>

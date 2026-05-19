@@ -829,6 +829,48 @@
       </div>
     </section>
 
+    <!-- WORK REVEAL 3 -->
+    <section class="work-reveal" id="workReveal3" aria-label="Work Reveal 3">
+      <div class="work-reveal-sticky">
+        <div class="bg" style="background:#000305"></div>
+
+        <div class="work-reveal-frame" id="workRevealFrame3">
+          <article class="work-reveal-card" aria-label="Featured Work 3">
+            <div class="work-reveal-media" style="background-image:url('assets/work3.jpg')"></div>
+          </article>
+        </div>
+
+        <div class="work-reveal-pop" id="workRevealPop3" role="dialog" aria-label="Story details">
+          <p class="meta" id="revealMeta3"></p>
+          <div class="hair"></div>
+          <div class="title" id="revealTitle3"></div>
+          <div class="line" id="revealLocation3"></div>
+          <p class="line" id="revealBlurb3"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORK REVEAL 4 -->
+    <section class="work-reveal" id="workReveal4" aria-label="Work Reveal 4">
+      <div class="work-reveal-sticky">
+        <div class="bg" style="background:#000305"></div>
+
+        <div class="work-reveal-frame" id="workRevealFrame4">
+          <article class="work-reveal-card" aria-label="Featured Work 4">
+            <div class="work-reveal-media" style="background-image:url('assets/work4.jpg')"></div>
+          </article>
+        </div>
+
+        <div class="work-reveal-pop" id="workRevealPop4" role="dialog" aria-label="Story details">
+          <p class="meta" id="revealMeta4"></p>
+          <div class="hair"></div>
+          <div class="title" id="revealTitle4"></div>
+          <div class="line" id="revealLocation4"></div>
+          <p class="line" id="revealBlurb4"></p>
+        </div>
+      </div>
+    </section>
+
 
 <!-- WORK (carousel: 4 items) -->
     <section class="panel work" id="reel" aria-label="Reel">
@@ -846,16 +888,16 @@
           </article>
 
           <article class="work-card" aria-label="Work 3">
-            <div class="work-media" style="background:#bbe4e9"></div>
+            <div class="work-media" style="background-image:url('assets/work3.jpg')"></div>
           </article>
 
           <article class="work-card" aria-label="Work 4">
-            <div class="work-media" style="background:#09252d"></div>
+            <div class="work-media" style="background-image:url('assets/work4.jpg')"></div>
           </article>
         </div>
 
         <div class="hlabel" aria-label="Work label">
-          <button class="work-trigger" id="workLabel" type="button" aria-label="Open Story details">Story</button>
+          <button class="work-trigger" id="workLabel" type="button" aria-label="Open Story details">Stories</button>
         </div>
 
         <button class="work-prev" id="workPrev" type="button" aria-label="Previous work">&lt;</button>
@@ -1191,27 +1233,26 @@
         ]
       },
       3: {
-        title: 'Still Torque',
-        location: 'Alps, CH',
-        focal: '24 mm',
-        iso: '200',
-        shutter: '1/125',
-        f: '2.0',
+        title: 'The Swan',
+        location: 'Detroit, MI',
+        focal: '48 mm',
+        iso: '80',
+        shutter: '1/60',
+        f: '1.8',
         blurb: [
-          'Power rests quietly beneath mountain air.',
-          'A pause before momentum returns.'
+          'A glimpse of white among the reds,',
+          'sitting still while the rest crouch low.'
         ]
       },
       4: {
-        title: 'Redline',
-        location: 'California, US',
-        focal: '85 mm',
-        iso: '64',
-        shutter: '1/250',
-        f: '1.8',
+        title: 'Top',
+        location: 'Seattle, WA',
+        focal: '48 mm',
+        iso: '1000',
+        shutter: '1/15',
+        f: '1.78',
         blurb: [
-          'Precision sharpened at the limit of control.',
-          'Every frame pushed to its edge.'
+          'Looking up at the place where the view begins.'
         ]
       },
     };
@@ -1429,6 +1470,30 @@
         locationId: 'revealLocation2',
         blurbId: 'revealBlurb2',
         storyId: 2,
+        startPadXvw: 20,
+        startPadYvh: 20,
+      }),
+      makeWorkRevealController({
+        sectionId: 'workReveal3',
+        frameId: 'workRevealFrame3',
+        popId: 'workRevealPop3',
+        metaId: 'revealMeta3',
+        titleId: 'revealTitle3',
+        locationId: 'revealLocation3',
+        blurbId: 'revealBlurb3',
+        storyId: 3,
+        startPadXvw: 20,
+        startPadYvh: 20,
+      }),
+      makeWorkRevealController({
+        sectionId: 'workReveal4',
+        frameId: 'workRevealFrame4',
+        popId: 'workRevealPop4',
+        metaId: 'revealMeta4',
+        titleId: 'revealTitle4',
+        locationId: 'revealLocation4',
+        blurbId: 'revealBlurb4',
+        storyId: 4,
         startPadXvw: 20,
         startPadYvh: 20,
       }),

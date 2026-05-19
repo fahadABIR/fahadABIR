@@ -49,7 +49,8 @@
       position:absolute;
       inset:0;
       background:
-        radial-gradient(1200px 900px at 20% 10%, rgba(0,0,0,.18), transparent 55%);
+        radial-gradient(1200px 900px at 20% 10%, rgba(0,0,0,.25), transparent 55%),
+        linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,.12) 45%, rgba(0,0,0,.55));
       z-index:0;
       pointer-events:none;
     }
@@ -62,7 +63,13 @@
       background-repeat:no-repeat;
       transform:translateZ(0);
       z-index:-1;
-      /* background-attachment: fixed removed — causes whole-viewport repaints on every scroll frame. */
+    }
+
+    @media (prefers-reduced-motion: no-preference){
+      .panel .bg{background-attachment:fixed}
+    }
+    @media (max-width: 900px){
+      .panel .bg{background-attachment:scroll}
     }
 
     /* Top nav */
@@ -91,9 +98,9 @@
       pointer-events:auto;
       padding:10px 14px;
       border:1px solid rgba(255,255,255,.12);
-      background:rgba(10,12,15,.55);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background:rgba(10,12,15,.35);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius:999px;
       box-shadow: 0 10px 36px rgba(0,0,0,.35);
     }
@@ -220,90 +227,6 @@
 
     h1{margin:0;font-weight:600;line-height:1.05;letter-spacing:-0.02em;font-size: clamp(34px, 5.2vw, 62px)}
 
-    /* Hero center animation — minimalist line-drawn loop */
-    .hero-anim{
-      position:absolute;
-      left:50%;
-      top:50%;
-      transform:translate(-50%, -50%);
-      z-index:1;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:18px;
-      pointer-events:none;
-      user-select:none;
-    }
-
-    .hero-anim-svg{
-      width: clamp(120px, 14vw, 180px);
-      height: clamp(120px, 14vw, 180px);
-      display:block;
-      overflow:visible;
-    }
-
-    .hero-anim-svg .shape *{
-      fill: none;
-      stroke: rgba(255,255,255,0.16);
-      stroke-width: 0.7;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      vector-effect: non-scaling-stroke;
-      stroke-dasharray: 100;
-      stroke-dashoffset: 100;
-      opacity: 0;
-      animation: heroDraw 12s linear infinite;
-      transform-box: fill-box;
-    }
-
-    /* Each shape gets a 4s window inside the 12s cycle */
-    .hero-anim-svg .shape-globe  *{ animation-delay:  0s; }
-    .hero-anim-svg .shape-camera *{ animation-delay: -8s; }
-    .hero-anim-svg .shape-frame  *{ animation-delay: -4s; }
-
-    @keyframes heroDraw{
-      0%    { stroke-dashoffset: 100; opacity: 0; }
-      4%    { opacity: 1; }
-      22%   { stroke-dashoffset: 0;   opacity: 1; }
-      30%   { stroke-dashoffset: 0;   opacity: 1; }
-      33%   { stroke-dashoffset: 0;   opacity: 0; }
-      100%  { stroke-dashoffset: 0;   opacity: 0; }
-    }
-
-    .hero-coords{
-      font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
-      font-size: clamp(11px, 1vw, 13px);
-      letter-spacing: 0.14em;
-      color: rgba(255,255,255,0.32);
-      white-space: nowrap;
-      display:inline-flex;
-      align-items:baseline;
-    }
-    .hero-coords .coords-num{
-      display:inline-block;
-      min-width: 7ch; /* reserve space so layout doesn't jitter while typing */
-      text-align:left;
-      position:relative;
-    }
-    .hero-coords .coords-num.is-typing::after{
-      content:"";
-      display:inline-block;
-      width: 0.5ch;
-      height: 1em;
-      vertical-align: -0.15em;
-      margin-left: 1px;
-      background: rgba(255,255,255,0.45);
-      animation: heroCaret 0.9s steps(2) infinite;
-    }
-    @keyframes heroCaret{ 50%{ opacity: 0; } }
-
-    @media (prefers-reduced-motion: reduce){
-      .hero-anim-svg .shape *{ animation: none; stroke-dashoffset: 0; opacity: 1; }
-      .hero-anim-svg .shape-camera *,
-      .hero-anim-svg .shape-frame *{ display:none; }
-      .hero-coords .coords-num.is-typing::after{ animation: none; }
-    }
-
     /* WORK (carousel, full screen) */
     .panel.work{padding:0}
     .panel.work::before{display:none}
@@ -422,28 +345,33 @@
     }
 
     .work-reveal-frame{
-      position: absolute;
-      inset: 0;
-      z-index: 2;
+    position: absolute;
+    inset: 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    /* 3/5 screen card at start (60%): paddingX=20vw, paddingY=20vh */
+    padding: var(--reveal-pad-y, 20vh) var(--reveal-pad-x, 20vw);
+
+    transition: padding 0.06s linear;
+    z-index: 2;
     }
 
-    /*
-      Reveal card uses clip-path: inset() instead of animating padding+border-radius.
-      clip-path is GPU-composited — padding/border-radius animations trigger layout/paint
-      on every scroll frame, which is what was making the scroll feel laggy.
-    */
+
+
     .work-reveal-card{
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: rgba(10,12,15,.22);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      clip-path: inset(var(--reveal-inset-y, 20vh) var(--reveal-inset-x, 20vw) round var(--reveal-radius, 32px));
-      will-change: clip-path;
-      transform: translateZ(0);
+    width: 100%;
+    height: 100%;
+    border-radius: var(--reveal-radius, 22px);
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(10,12,15,.22);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    transition: border-radius 0.08s linear;
     }
 
 
@@ -712,43 +640,7 @@
   <main id="top">
     <!-- HERO -->
     <section class="panel" aria-label="Hero">
-      <div class="bg" style="background: linear-gradient(to bottom, #001829 0%, #001829 35%, #000305 100%);"></div>
-
-      <!-- Subtle line-drawn loop in the middle of the hero -->
-      <div class="hero-anim" aria-hidden="true">
-        <svg class="hero-anim-svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-          <!-- Globe -->
-          <g class="shape shape-globe">
-            <circle cx="50" cy="50" r="30" pathLength="100"></circle>
-            <ellipse cx="50" cy="50" rx="30" ry="11" pathLength="100"></ellipse>
-            <ellipse cx="50" cy="50" rx="11" ry="30" pathLength="100"></ellipse>
-            <path d="M22 38 Q 50 50 78 38" pathLength="100"></path>
-            <path d="M22 62 Q 50 50 78 62" pathLength="100"></path>
-          </g>
-
-          <!-- Camera -->
-          <g class="shape shape-camera">
-            <rect x="18" y="34" width="64" height="42" rx="3" pathLength="100"></rect>
-            <rect x="38" y="26" width="18" height="8" rx="1" pathLength="100"></rect>
-            <circle cx="50" cy="56" r="14" pathLength="100"></circle>
-            <circle cx="50" cy="56" r="8" pathLength="100"></circle>
-            <circle cx="72" cy="42" r="1.6" pathLength="100"></circle>
-          </g>
-
-          <!-- Picture frame -->
-          <g class="shape shape-frame">
-            <rect x="20" y="22" width="60" height="56" pathLength="100"></rect>
-            <rect x="28" y="30" width="44" height="40" pathLength="100"></rect>
-            <path d="M28 60 L40 48 L50 55 L60 44 L72 55 L72 70 L28 70 Z" pathLength="100"></path>
-            <circle cx="60" cy="40" r="3" pathLength="100"></circle>
-          </g>
-        </svg>
-
-        <div class="hero-coords">
-          <span class="coords-num" id="coordLat"></span><span class="coords-static">° N,&nbsp;&nbsp;</span><span class="coords-num" id="coordLon"></span><span class="coords-static">° W</span>
-        </div>
-      </div>
-
+      <div class="bg" style="background:#001829"></div>
       <div class="card" id="content">
         <h1>Quiet images.<br/>Loud feelings.</h1>
       </div>
@@ -759,7 +651,7 @@
     <!-- WORK REVEAL 1 -->
     <section class="work-reveal" id="workReveal" aria-label="Work Reveal">
       <div class="work-reveal-sticky">
-        <div class="bg" style="background:#000305"></div>
+        <div class="bg" style="background:#001829"></div>
 
         <div class="work-reveal-frame" id="workRevealFrame">
           <article class="work-reveal-card" aria-label="Featured Work">
@@ -780,7 +672,7 @@
     <!-- WORK REVEAL 2 -->
     <section class="work-reveal" id="workReveal2" aria-label="Work Reveal 2">
       <div class="work-reveal-sticky">
-        <div class="bg" style="background:#000305"></div>
+        <div class="bg" style="background:#001829"></div>
 
         <div class="work-reveal-frame" id="workRevealFrame2">
           <article class="work-reveal-card" aria-label="Featured Work 2">
@@ -801,7 +693,7 @@
 
 <!-- WORK (carousel: 4 items) -->
     <section class="panel work" id="reel" aria-label="Reel">
-      <div class="bg" style="background:#000305"></div>
+      <div class="bg" style="background:#001829"></div>
       <h2 class="blog-title style=">ROLL THE REEL</h2>
 
       <div class="work-stage" aria-label="Work carousel stage">
@@ -1136,27 +1028,27 @@
     // 4 unique story configs
     const storyDetails = {
       1: {
-        title: 'House with the Tree',
-        location: 'Enumclaw, WA',
-        focal: '48 mm',
-        iso: '640',
-        shutter: '1/24',
+        title: 'Off the Clock',
+        location: 'Lake Michigan, MI',
+        focal: '24 mm',
+        iso: '200',
+        shutter: '1/88',
         f: '1.78',
         blurb: [
-          'A moment of controlled chaos captured at the edge of motion.',
-          'Where mechanical force meets human intention.'
+          'A lone boat drifting on glassy water, the sky fading from deep navy into gold.',
+          'The kind of sunset that makes you forget you have a phone, a job, or anywhere else to be.'
         ]
       },
       2: {
-        title: 'Midnight Run',
-        location: 'Tokyo, JP',
-        focal: '50 mm',
-        iso: '400',
-        shutter: '1/80',
-        f: '1.4',
+        title: 'Peach Hour',
+        location: 'South Haven, MI',
+        focal: '100 mm',
+        iso: '640',
+        shutter: '1/60',
+        f: '2.8',
         blurb: [
-          'Neon lights spill across wet asphalt in silence.',
-          'Speed dissolves into rhythm after dark.'
+          'A yacht sitting still on a sea of soft orange,',
+          'the horizon glowing like the inside of a peach'
         ]
       },
       3: {
@@ -1325,32 +1217,29 @@
         const total = Math.max(1, rect.height - vh);
         const p = clamp01((0 - rect.top) / total);
 
-        // Single clip-path update — composited on the GPU, no layout/paint cost.
-        let insetX = 0;
-        let insetY = 0;
-        let radius = 0;
+        let padX = 0;
+        let padY = 0;
 
         if (p <= collapseEnd){
-          const t = p / collapseEnd;       // 0..1
-          insetX = startPadXvw * (1 - t);  // 20vw -> 0
-          insetY = startPadYvh * (1 - t);  // 20vh -> 0
-          radius = 32 * (1 - t);           // 32px -> 0
+        const t = p / collapseEnd; // 0..1
+        padX = startPadXvw * (1 - t); // 20vw -> 0
+        padY = startPadYvh * (1 - t); // 20vh -> 0
         }
 
-        const card = frame.firstElementChild;
-        if (card){
-          card.style.setProperty('--reveal-inset-x', `${insetX}vw`);
-          card.style.setProperty('--reveal-inset-y', `${insetY}vh`);
-          card.style.setProperty('--reveal-radius', `${radius}px`);
+        frame.style.setProperty('--reveal-pad-x', `${padX}vw`);
+        frame.style.setProperty('--reveal-pad-y', `${padY}vh`);
+        // Radius: 22px → 0px during collapse
+        let radius = 0;
+        if (p <= collapseEnd){
+        const t = p / collapseEnd;   // 0..1
+        radius = 32 * (1 - t);     // chnange this value to adjust initial radius
         }
+        frame.firstElementChild?.style.setProperty('--reveal-radius', `${radius}px`);
 
 
 
 
-        // Once the popover appears, keep it stuck until the user scrolls
-        // back up past the collapse threshold (so it doesn't flicker away
-        // as you continue scrolling down through the section).
-        const shouldOpen = (p >= collapseEnd);
+        const shouldOpen = (p >= collapseEnd && p <= holdEnd);
         if (shouldOpen && !isOpen){
           pop.classList.add('open');
           isOpen = true;
@@ -1421,70 +1310,6 @@
     snapBlogToNearest(true);
     updateBlogNav();
     scheduleAllReveals();
-
-    // Hero coordinates: typewriter loop. N and W stay static; only the numbers retype.
-    (function heroCoordsTyper(){
-      const latEl = document.getElementById('coordLat');
-      const lonEl = document.getElementById('coordLon');
-      if (!latEl || !lonEl) return;
-
-      const LAT = '42.2897';
-      const LON = '85.5856';
-
-      const TYPE_MS = 95;     // per character
-      const PAUSE_BETWEEN = 550;
-      const HOLD_AFTER = 1800;
-      const ERASE_MS = 45;
-
-      function setCaret(target){
-        latEl.classList.toggle('is-typing', target === latEl);
-        lonEl.classList.toggle('is-typing', target === lonEl);
-      }
-
-      async function typeInto(el, text){
-        setCaret(el);
-        for (let i = 1; i <= text.length; i++){
-          el.textContent = text.slice(0, i);
-          await wait(TYPE_MS + Math.random()*40);
-        }
-      }
-
-      async function eraseFrom(el){
-        setCaret(el);
-        const cur = el.textContent;
-        for (let i = cur.length; i >= 0; i--){
-          el.textContent = cur.slice(0, i);
-          await wait(ERASE_MS);
-        }
-      }
-
-      function wait(ms){ return new Promise(r => setTimeout(r, ms)); }
-
-      async function loop(){
-        // Respect reduced motion: just show the static value.
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-          latEl.textContent = LAT;
-          lonEl.textContent = LON;
-          return;
-        }
-        // start empty
-        latEl.textContent = '';
-        lonEl.textContent = '';
-
-        while (true){
-          await typeInto(latEl, LAT);
-          await wait(PAUSE_BETWEEN);
-          await typeInto(lonEl, LON);
-          setCaret(lonEl);
-          await wait(HOLD_AFTER);
-          await eraseFrom(lonEl);
-          await eraseFrom(latEl);
-          await wait(350);
-        }
-      }
-
-      loop();
-    })();
   </script>
 </body>
 </html>

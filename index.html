@@ -351,13 +351,6 @@
     .panel.work{padding:0}
     .panel.work::before{display:none}
 
-    /* Stories is pinned: the section is tall, the stage sticks, and vertical
-       page scroll is mapped to horizontal card movement by JS.
-       display:block (overriding .panel's flex-end) so the sticky stage starts
-       at the top and pins immediately — no empty gap before the cards. */
-    #reel{ display:block; height: 320vh; min-height:0; }
-    #reel .work-stage{ position: sticky; inset:auto; top:0; height:100vh; }
-
     .work-stage{
       position:absolute;
       inset:0;
@@ -373,9 +366,11 @@
       display:flex;
       align-items:center;
       gap: 22px;
-      overflow-x:hidden;      /* driven by JS from page scroll */
+      overflow-x:auto;
       overflow-y:hidden;
-      scroll-snap-type: none;
+      scroll-snap-type: x mandatory;
+      scroll-snap-stop: always;
+      scroll-behavior: smooth;
 
       /* centre the narrower 16:10 cards horizontally */
       padding: 0 max(16px, calc(50vw - (var(--reel-card-h) * 0.3125)));
@@ -1472,49 +1467,33 @@
       return workCarousel ? workCarousel.querySelectorAll('.work-card').length : 0;
     }
 
-    function reelRange(){
-      if (!reelSection) return 1;
-      return Math.max(1, reelSection.offsetHeight - window.innerHeight);
+    function getWorkStep(){
+      if (!workCarousel) return 0;
+      const card = workCarousel.querySelector('.work-card');
+      if (!card) return 0;
+      return card.getBoundingClientRect().width + 22; // card width + gap
     }
 
-    function reelProgress(){
-      if (!reelSection) return 0;
-      const rect = reelSection.getBoundingClientRect();
-      return clamp01((0 - rect.top) / reelRange());
+    function getActiveWorkIndex(){
+      if (!workCarousel) return 0;
+      const step = getWorkStep() || 1;
+      return Math.round(workCarousel.scrollLeft / step);
     }
 
-    let reelRaf = null;
-    function updateReel(){
-      reelRaf = null;
-      if (!workCarousel || !reelSection) return;
-      const max = workCarousel.scrollWidth - workCarousel.clientWidth;
-      workCarousel.scrollLeft = reelProgress() * max;
-    }
-    function scheduleReel(){
-      if (reelRaf) return;
-      reelRaf = requestAnimationFrame(updateReel);
-    }
-
-    window.addEventListener('scroll', scheduleReel, { passive:true });
-
-    // Arrows scroll the PAGE so the pinned carousel advances/retreats one card.
-    function nudgeReel(dir){
-      if (!reelSection) return;
+    function scrollWorkToIndex(nextIdx){
+      if (!workCarousel) return;
       const count = getWorkCount();
-      const per = reelRange() / Math.max(1, count - 1);
-      const curIdx = Math.round(reelProgress() * (count - 1));
-      const nextIdx = Math.max(0, Math.min(count - 1, curIdx + dir));
-      const rectTop = reelSection.getBoundingClientRect().top;
-      const target = window.scrollY + rectTop + nextIdx * per;
-      window.scrollTo({ top: target, behavior: 'smooth' });
+      const idx = Math.max(0, Math.min(count - 1, nextIdx));
+      workCarousel.scrollTo({ left: idx * getWorkStep(), behavior: 'smooth' });
     }
 
-    workNext?.addEventListener('click', (e) => { e.preventDefault(); nudgeReel(1); });
-    workPrev?.addEventListener('click', (e) => { e.preventDefault(); nudgeReel(-1); });
+    // Arrows / arrow-keys move the carousel one card; native swipe & snap handle the rest.
+    workNext?.addEventListener('click', (e) => { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() + 1); });
+    workPrev?.addEventListener('click', (e) => { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() - 1); });
 
     workCarousel?.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight') { e.preventDefault(); nudgeReel(1); }
-      if (e.key === 'ArrowLeft')  { e.preventDefault(); nudgeReel(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() + 1); }
+      if (e.key === 'ArrowLeft')  { e.preventDefault(); scrollWorkToIndex(getActiveWorkIndex() - 1); }
     });
 
     // Floating swiss-glass popover (Story details) for Work carousel "Story"
@@ -1986,9 +1965,10 @@
     window.addEventListener('resize', () => {
       closePopover();
       closeAllReveals();
-      scheduleReel();
+      scrollWorkToIndex(getActiveWorkIndex());
       snapBlogToNearest(true);
       scheduleAllReveals();
+      centerBandTitles();
     }, { passive:true });
 
     // T&C modal
@@ -2007,11 +1987,29 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
     })();
 
+    // Center each section heading within the empty band above its centered
+    // cards, so the gap above and below the heading is equal at any screen size.
+    function centerBandTitle(sectionId, titleSel, cardSel){
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+      const title = section.querySelector(titleSel);
+      const card = section.querySelector(cardSel);
+      if (!title || !card) return;
+      const gap = Math.max(0, card.getBoundingClientRect().top - section.getBoundingClientRect().top);
+      title.style.top = (gap / 2) + 'px';
+      title.style.transform = 'translate(-50%, -50%)';
+    }
+    function centerBandTitles(){
+      centerBandTitle('reel', '.stories-title', '.work-card');
+      centerBandTitle('blog', '.blog-title', '.blog-card');
+    }
+
     // Init
-    scheduleReel();
     snapBlogToNearest(true);
     updateBlogNav();
     scheduleAllReveals();
+    centerBandTitles();
+    window.addEventListener('load', centerBandTitles);
 
     // Hero coordinates: typewriter loop. N and W stay static; only the numbers retype.
     (function heroCoordsTyper(){

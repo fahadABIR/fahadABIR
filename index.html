@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>fahadABIR</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <meta name="description" content="Minimal photographer landing page." />
   <style>
     :root{
@@ -569,6 +570,8 @@
     .work-reveal-pop .hair{height:1px;background:rgba(255,255,255,.12);margin:10px 0}
     .work-reveal-pop .meta{font-size:12px;letter-spacing:.06em;color:rgba(245,246,247,.78);margin:0 0 12px 0}
     .work-reveal-pop .meta b{color:rgba(245,246,247,.92);font-weight:620}
+    /* Focal-length value tinted a soft yellow (echoes the zoom-scale pill) */
+    .focal-val{color:#ffe27a;font-weight:620}
 
     /* =========================================================
        DESKTOP / LARGE SCREEN — editorial two-column work treatment.
@@ -661,6 +664,22 @@
       color: rgba(245,246,247,.5);
       font-variant-numeric: tabular-nums;
     }
+
+    /* Mobile reveal: focal-length scale that sits BEHIND the image (z-index 1,
+       under the frame at z-index 2) at the bottom. It peeks out below the
+       windowed photo and is covered as the photo expands to full-bleed. */
+    .wr-mzoom{
+      position:absolute;
+      left:50%;
+      bottom: 7vh;
+      transform: translateX(-50%);
+      width: min(360px, 78vw);
+      z-index:3;
+      opacity:0;
+      pointer-events:none;
+      will-change: opacity;
+    }
+    @media (min-width: 900px){ .wr-mzoom{ display:none; } }
 
     /* Caption card — identical glass treatment to the phone Story popover */
     .wr-card{
@@ -914,7 +933,7 @@
       align-items:center;
       justify-content:space-between;
       gap:14px;
-      flex-wrap:wrap;
+      flex-wrap:nowrap;
       padding: 18px var(--pad) 22px;
       border-top:1px solid rgba(255,255,255,.06);
       font-size:11px;
@@ -930,8 +949,73 @@
     .foot-links a:hover{color: rgba(245,246,247,.85)}
     .foot-dot{color: rgba(245,246,247,.25)}
     .foot-top{font-size:13px;line-height:1}
-    @media (max-width:520px){
-      .site-footer{justify-content:center;text-align:center}
+
+    /* T&C modal — low-key glass sheet */
+    .tnc-overlay{
+      position:fixed;
+      inset:0;
+      z-index:120;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: var(--pad);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .22s ease;
+    }
+    .tnc-overlay.open{opacity:1;pointer-events:auto}
+    .tnc-sheet{
+      position:relative;
+      width:min(560px, 100%);
+      max-height: 80vh;
+      overflow:auto;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(14,16,22,.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 30px 80px rgba(0,0,0,.55);
+      padding: 26px 26px 22px;
+      transform: translateY(8px);
+      transition: transform .22s ease;
+      scrollbar-width:none;
+    }
+    .tnc-sheet::-webkit-scrollbar{display:none}
+    .tnc-overlay.open .tnc-sheet{transform:translateY(0)}
+    .tnc-close{
+      position:absolute;
+      top:14px; right:16px;
+      width:30px;height:30px;
+      border:none;background:transparent;
+      color: rgba(245,246,247,.5);
+      font-size:22px;line-height:1;cursor:pointer;
+      transition: color .2s ease;
+    }
+    .tnc-close:hover{color: rgba(245,246,247,.9)}
+    .tnc-title{
+      margin:0 0 16px 0;
+      font-size:12px;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+      font-weight:700;
+      color: rgba(245,246,247,.82);
+    }
+    .tnc-body p{
+      margin:0 0 14px 0;
+      font-size:13px;
+      line-height:1.7;
+      letter-spacing:.01em;
+      color: rgba(245,246,247,.62);
+      text-wrap:pretty;
+    }
+    .tnc-body .tnc-foot{
+      margin-top:18px;
+      font-size:11px;
+      letter-spacing:.08em;
+      color: rgba(245,246,247,.38);
     }
 
     /* Accessibility */
@@ -1212,11 +1296,26 @@
     <footer class="site-footer" aria-label="Footer">
       <span class="foot-copy">© 2026 Abir H</span>
       <nav class="foot-links" aria-label="Legal">
-        <a href="#">T&amp;C</a>
+        <a href="#" id="tncOpen">T&amp;C</a>
         <span class="foot-dot" aria-hidden="true">·</span>
-        <a href="#" class="foot-top" aria-label="Back to top">↑</a>
+        <a href="#top" class="foot-top" aria-label="Back to top">↑</a>
       </nav>
     </footer>
+
+    <!-- T&C modal -->
+    <div class="tnc-overlay" id="tncOverlay" role="dialog" aria-modal="true" aria-label="Terms &amp; Conditions" aria-hidden="true">
+      <div class="tnc-sheet">
+        <button class="tnc-close" id="tncClose" type="button" aria-label="Close">×</button>
+        <h3 class="tnc-title">Terms &amp; Conditions</h3>
+        <div class="tnc-body">
+          <p>Every photograph and word on this page is the property of Abir Hossain. Use of any content from this page, including copying, reproduction, redistribution, or commercial use, without my prior written agreement is strictly prohibited.</p>
+          <p>You’re welcome to view and share a link to this page. The images themselves may not be downloaded, edited, reposted, or used in any project without permission.</p>
+          <p>Licensing and print enquiries are handled case by case. Reach out via the contact links and we’ll sort something out.</p>
+          <p>All frames are shot and edited by me. Locations and capture details are shared in good faith and may be approximate.</p>
+          <p class="tnc-foot">© 2026 Abir Hossain. All rights reserved.</p>
+        </div>
+      </div>
+    </div>
   </main>
 
   <script>
@@ -1530,7 +1629,7 @@
       const id = getStoryIdFor(anchorEl);
       const d = storyDetails[id] || storyDetails[1];
 
-      popMeta.innerHTML = `<b>Focal Length:</b> ${d.focal} &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
+      popMeta.innerHTML = `<b>Focal Length:</b> <span class="focal-val">${d.focal}</span> &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
       popTitle.textContent = d.title;
       popLocation.textContent = d.location;
       popBlurb.innerHTML = `${d.blurb[0]}<br/>${d.blurb[1]}`;
@@ -1582,7 +1681,7 @@
     function setRevealPopover({ storyId, metaEl, titleEl, locationEl, blurbEl }){
       const d = storyDetails[storyId] || storyDetails[1];
       if (metaEl) {
-        metaEl.innerHTML = `<b>Focal Length:</b> ${d.focal} &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
+        metaEl.innerHTML = `<b>Focal Length:</b> <span class="focal-val">${d.focal}</span> &nbsp;|&nbsp; <b>ISO:</b> ${d.iso}<br/><b>Shutter:</b> ${d.shutter} &nbsp;|&nbsp; <b>F</b> ${d.f}`;
       }
       if (titleEl) titleEl.textContent = d.title;
       if (locationEl) locationEl.textContent = d.location;
@@ -1670,6 +1769,32 @@
       };
     }
 
+    // Mobile reveal focal-length scale, mounted BEHIND the image at the bottom.
+    function buildWorkMobileScale(section, storyId){
+      const sticky = section.querySelector('.work-reveal-sticky');
+      if (!sticky) return null;
+      const d = storyDetails[storyId] || storyDetails[1];
+      const F = parseInt(d.focal, 10) || 24;
+      const labels = [1, 1.25, 1.5, 1.75, 2]
+        .map(m => `<span>${Math.round(F * m)}</span>`).join('');
+
+      const el = document.createElement('div');
+      el.className = 'wr-mzoom';
+      el.setAttribute('aria-hidden', 'true');
+      el.innerHTML = `
+        <div class="wr-zoom-track"><span class="wr-zoom-thumb"><span class="wr-zoom-val">${Math.round(F * 2)}mm</span></span></div>
+        <div class="wr-zoom-labels">${labels}</div>`;
+      // First child so it sits beneath the frame in paint order too.
+      sticky.insertBefore(el, sticky.firstChild);
+
+      return {
+        el,
+        focal: F,
+        thumb: el.querySelector('.wr-zoom-thumb'),
+        val: el.querySelector('.wr-zoom-val'),
+      };
+    }
+
     function makeWorkRevealController(cfg){
       const {
         sectionId,
@@ -1702,6 +1827,8 @@
 
       // Desktop editorial two-column (built once, animated on scroll).
       const dk = buildWorkDesktop(section, storyId);
+      // Mobile focal scale, behind the image (built once, animated on scroll).
+      const mk = buildWorkMobileScale(section, storyId);
 
       let raf = null;
       let isOpen = false;
@@ -1730,6 +1857,20 @@
           card.style.setProperty('--reveal-inset-x', `${insetX}vw`);
           card.style.setProperty('--reveal-inset-y', `${insetY}vh`);
           card.style.setProperty('--reveal-radius', `${radius}px`);
+        }
+
+        // Mobile: focal scale fades in as the photo begins to reveal and stays
+        // visible over it, then crossfades out exactly as the details plate
+        // slides up to replace it. Thumb/value track the reveal like desktop.
+        if (mk){
+          const fillP = clamp01(p / collapseEnd);     // 0 (windowed) -> 1 (full bleed)
+          const fadeIn  = clamp01(p / 0.05);
+          const fadeOut = clamp01((collapseEnd + 0.02 - p) / 0.07); // out as plate opens
+          mk.el.style.opacity = (fadeIn * fadeOut * 0.5).toFixed(3);
+          if (mk.thumb){
+            mk.thumb.style.left = `${(6 + (1 - fillP) * 88).toFixed(2)}%`;
+            if (mk.val) mk.val.textContent = Math.round(mk.focal * (2 - fillP)) + 'mm';
+          }
         }
 
 
@@ -1849,6 +1990,22 @@
       snapBlogToNearest(true);
       scheduleAllReveals();
     }, { passive:true });
+
+    // T&C modal
+    (function tnc(){
+      const open = document.getElementById('tncOpen');
+      const close = document.getElementById('tncClose');
+      const overlay = document.getElementById('tncOverlay');
+      if (!open || !overlay) return;
+
+      function show(e){ if(e) e.preventDefault(); overlay.classList.add('open'); overlay.setAttribute('aria-hidden','false'); }
+      function hide(){ overlay.classList.remove('open'); overlay.setAttribute('aria-hidden','true'); }
+
+      open.addEventListener('click', show);
+      close?.addEventListener('click', hide);
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) hide(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') hide(); });
+    })();
 
     // Init
     scheduleReel();

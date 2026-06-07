@@ -10,18 +10,49 @@
 <body id="top">
   <header class="site-nav" id="siteHeader">
     <nav class="nav" aria-label="Primary">
-      <a class="brand" href="../index.html"><span>fahadABIR</span></a>
-      <div class="links" aria-label="Desktop links">
-        <a href="../index.html#reel">Stories</a>
-        <a href="../index.html#blog">Thoughts</a>
-        <a href="../index.html#contact">Contact</a>
+      <div class="nav-top">
+        <a class="brand" href="../index.html"><span>fahadABIR</span></a>
+        <div class="links" aria-label="Desktop links">
+          <div class="nav-drop">
+            <a href="../index.html#reel">Stories</a>
+          </div>
+          <a href="../index.html#blog">Thoughts</a>
+          <a href="../index.html#contact">Contact</a>
+        </div>
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
+          <span aria-hidden="true"></span>
+        </button>
       </div>
-      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-      </button>
+      <div class="nav-expand" aria-label="Story categories">
+        <div class="nav-expand-inner">
+          <div class="nav-expand-pad">
+            <a href="sunsets.html">sunsets</a>
+            <a href="cars.html">cars</a>
+            <a href="concretes.html">concretes</a>
+            <a href="nature.html">nature</a>
+          </div>
+        </div>
+      </div>
     </nav>
     <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
-      <a href="../index.html#reel">Stories</a>
+      <div class="mm-group">
+        <div class="mm-row">
+          <a href="../index.html#reel" class="mm-link">Stories</a>
+          <button class="mm-toggle" id="mmStoriesToggle" aria-label="Show story categories" aria-expanded="false" aria-controls="mmStoriesSub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="mm-sub" id="mmStoriesSub">
+          <div class="mm-sub-inner">
+            <div class="mm-sub-pad">
+              <a href="sunsets.html">sunsets</a>
+              <a href="cars.html">cars</a>
+              <a href="concretes.html">concretes</a>
+              <a href="nature.html">nature</a>
+            </div>
+          </div>
+        </div>
+      </div>
       <a href="../index.html#blog">Thoughts</a>
       <a href="../index.html#contact">Contact</a>
     </div>
@@ -65,6 +96,19 @@
     function toggleMenu(){ mobileMenu.classList.contains('open') ? closeMenu() : openMenu(); }
     hamburger?.addEventListener('click', (e) => { e.preventDefault(); toggleMenu(); });
     mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMenu()));
+    const mmStoriesToggle = document.getElementById('mmStoriesToggle');
+    const mmStoriesSub = document.getElementById('mmStoriesSub');
+    mmStoriesToggle?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); const open = mmStoriesSub.classList.toggle('open'); mmStoriesToggle.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+    (function(){
+      const nav = document.querySelector('.nav');
+      const drop = document.querySelector('.nav-drop');
+      const expand = document.querySelector('.nav-expand');
+      if (!nav || !drop || !expand) return;
+      function place(){ const dr = drop.getBoundingClientRect(); const er = expand.getBoundingClientRect(); nav.style.setProperty('--stories-left', (dr.left - er.left) + 'px'); }
+      place(); window.addEventListener('resize', place);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+      setTimeout(place, 300);
+    })();
     document.addEventListener('click', (e) => {
       if(!isPhone() || !mobileMenu.classList.contains('open')) return;
       if(!(mobileMenu.contains(e.target) || hamburger.contains(e.target))) closeMenu();

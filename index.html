@@ -88,19 +88,25 @@
 
     .nav{
       width:min(var(--max), 100%);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      display:block;
       pointer-events:auto;
       padding:10px 14px;
       border:1px solid rgba(255,255,255,.12);
       background:rgba(10,12,15,.55);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
-      border-radius:999px;
+      border-radius:28px;
       box-shadow: 0 10px 36px rgba(0,0,0,.35);
     }
+    .nav-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    /* When the Stories area (or the open panel) is hovered */
+    .nav:has(.nav-drop:hover) ,
+    .nav:has(.nav-expand:hover){ }
 
     .brand{
       display:flex;
@@ -126,10 +132,47 @@
       text-decoration:none;
       padding:8px 10px;
       border-radius:999px;
-      transition: background .2s ease, color .2s ease, border-color .2s ease;
+      transition: color .2s ease, transform .2s ease;
       border:1px solid transparent;
     }
-    .links a:hover{color:var(--fg); background:rgba(255,255,255,.08); border-color:rgba(255,255,255,.12)}
+    .links a:hover{color:#ffffff; background:none; border-color:transparent; transform: translateY(-2px)}
+
+    /* Stories hover: the whole navbar expands downward to reveal the 4 options */
+    .nav-drop{ position:relative; display:flex; }
+
+    .nav-expand{
+      max-height:0;
+      overflow:hidden;
+      opacity:0;
+      transition: max-height .9s cubic-bezier(.22,1,.36,1),
+                  opacity .7s ease;
+    }
+    .nav:has(.nav-drop:hover) .nav-expand,
+    .nav:has(.nav-expand:hover) .nav-expand,
+    .nav:focus-within .nav-expand{
+      max-height:170px;
+      opacity:1;
+    }
+    .nav-expand-inner{ overflow:hidden; }
+    .nav-expand-pad{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;        /* options sit directly under the Stories link */
+      gap:2px;
+      padding:8px 8px 4px 0;
+      padding-left: var(--stories-left, 0px);
+    }
+    .nav-expand-pad a{
+      color:rgba(245,246,247,.62);
+      text-decoration:none;
+      text-transform:lowercase;
+      letter-spacing:.16em;
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:10px;
+      transition: color .2s ease, background .2s ease;
+    }
+    .nav-expand-pad a:hover{ color:#ffe27a; background:none; }
 
     .hamburger{
       display:none;
@@ -186,11 +229,73 @@
     }
     .mobile-menu a + a{margin-top:10px}
     .mobile-menu a:hover{background: rgba(255,255,255,.08)}
+    /* top-level items below the Stories row need their own spacing */
+    .mobile-menu > a{ margin-top:10px; }
+    .mm-sub-pad a + a{ margin-top:0; }
+
+    /* Mobile Stories group: one border wraps the row AND the expanded options */
+    .mm-group{
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    .mm-row{
+      display:flex;
+      align-items:stretch;
+    }
+    .mm-row .mm-link{
+      flex:1;
+      border:none;
+      background:transparent;
+      border-radius:0;
+    }
+    .mm-toggle{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:48px;
+      flex:0 0 auto;
+      border:none;
+      background:transparent;
+      color: var(--fg);
+      cursor:pointer;
+      transition: color .2s ease;
+    }
+    .mm-toggle svg{ width:18px; height:18px; transition: transform .34s cubic-bezier(.22,1,.36,1); }
+    .mm-toggle[aria-expanded="true"] svg{ transform: rotate(180deg); }
+    .mm-toggle[aria-expanded="true"]{ color:#ffe27a; }
+
+    .mm-sub{
+      display:grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows .38s cubic-bezier(.22,1,.36,1),
+                  opacity .3s ease;
+      opacity:0;
+    }
+    .mm-sub.open{ grid-template-rows: 1fr; opacity:1; }
+    .mm-sub-inner{ overflow:hidden; min-height:0; }
+    .mm-sub-pad{ display:flex; flex-direction:column; gap:2px; padding:6px 10px 8px 18px; }
+    .mm-sub-pad a{
+      text-transform:lowercase;
+      letter-spacing:.14em;
+      font-size:12px;
+      color: rgba(245,246,247,.7);
+      padding:11px 14px;
+      margin:0;
+      border-radius:12px;
+      border:none;
+      background: transparent;
+      justify-content:flex-start;
+    }
+    .mm-sub-pad a:hover{ color:#fff; background: rgba(255,255,255,.06); }
 
     @media (max-width: 700px){
       header{padding:12px var(--pad)}
       .links{display:none}
       .hamburger{display:inline-flex}
+      .nav-expand{display:none}
+      .nav{border-radius:999px !important}
     }
 
     /* Hero */
@@ -1030,21 +1135,53 @@
 
   <header id="siteHeader">
     <nav class="nav" aria-label="Primary">
-      <a class="brand" href="#top"><span>fahadABIR</span></a>
+      <div class="nav-top">
+        <a class="brand" href="#top"><span>fahadABIR</span></a>
 
-      <div class="links" aria-label="Desktop links">
-        <a href="#reel">Stories</a>
-        <a href="#blog">Thoughts</a>
-        <a href="#contact">Contact</a>
+        <div class="links" aria-label="Desktop links">
+          <div class="nav-drop">
+            <a href="#reel">Stories</a>
+          </div>
+          <a href="#blog">Thoughts</a>
+          <a href="#contact">Contact</a>
+        </div>
+
+        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
+          <span aria-hidden="true"></span>
+        </button>
       </div>
 
-      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
-        <span aria-hidden="true"></span>
-      </button>
+      <div class="nav-expand" aria-label="Story categories">
+        <div class="nav-expand-inner">
+          <div class="nav-expand-pad">
+            <a href="stories/sunsets.html">sunsets</a>
+            <a href="stories/cars.html">cars</a>
+            <a href="stories/concretes.html">concretes</a>
+            <a href="stories/nature.html">nature</a>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
-      <a href="#reel">Stories</a>
+      <div class="mm-group">
+        <div class="mm-row">
+          <a href="#reel" class="mm-link">Stories</a>
+          <button class="mm-toggle" id="mmStoriesToggle" aria-label="Show story categories" aria-expanded="false" aria-controls="mmStoriesSub">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="mm-sub" id="mmStoriesSub">
+          <div class="mm-sub-inner">
+            <div class="mm-sub-pad">
+              <a href="stories/sunsets.html">sunsets</a>
+              <a href="stories/cars.html">cars</a>
+              <a href="stories/concretes.html">concretes</a>
+              <a href="stories/nature.html">nature</a>
+            </div>
+          </div>
+        </div>
+      </div>
       <a href="#blog">Thoughts</a>
       <a href="#contact">Contact</a>
     </div>
@@ -1195,17 +1332,17 @@
           </a>
 
           <a class="work-card" aria-label="Cars" href="stories/cars.html">
-            <div class="work-media" style="background-image:url('assets/work2.jpg')"></div>
+            <div class="work-media" style="background-image:url('assets/work3.jpg')"></div>
             <span class="work-word">cars</span>
           </a>
 
           <a class="work-card" aria-label="Concretes" href="stories/concretes.html">
-            <div class="work-media" style="background-image:url('assets/work3.jpg')"></div>
+            <div class="work-media" style="background-image:url('assets/work4.jpg')"></div>
             <span class="work-word">concretes</span>
           </a>
 
           <a class="work-card" aria-label="Nature" href="stories/nature.html">
-            <div class="work-media" style="background-image:url('assets/work4.jpg')"></div>
+            <div class="work-media" style="background-image:url('assets/work2.jpg')"></div>
             <span class="work-word">nature</span>
           </a>
         </div>
@@ -1346,6 +1483,23 @@
       }
     }, { passive:true });
 
+    // Align the expanded Stories options directly under the "Stories" link
+    (function(){
+      const nav = document.querySelector('.nav');
+      const drop = document.querySelector('.nav-drop');
+      const expand = document.querySelector('.nav-expand');
+      if (!nav || !drop || !expand) return;
+      function place(){
+        const dr = drop.getBoundingClientRect();
+        const er = expand.getBoundingClientRect();
+        nav.style.setProperty('--stories-left', (dr.left - er.left) + 'px');
+      }
+      place();
+      window.addEventListener('resize', place);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
+      setTimeout(place, 300);
+    })();
+
     // Mobile hamburger
     const hamburger = document.getElementById('hamburger');
     const mobileMenu = document.getElementById('mobileMenu');
@@ -1374,6 +1528,17 @@
     });
 
     mobileMenu?.querySelectorAll('a')?.forEach(a => a.addEventListener('click', () => closeMenu()));
+
+    // Mobile: the down-arrow next to "Stories" reveals the 4 category links.
+    // The "Stories" label itself still jumps to the section (it's a separate <a>).
+    const mmStoriesToggle = document.getElementById('mmStoriesToggle');
+    const mmStoriesSub = document.getElementById('mmStoriesSub');
+    mmStoriesToggle?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const open = mmStoriesSub.classList.toggle('open');
+      mmStoriesToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
 
     document.addEventListener('click', (e) => {
       if (!isPhone()) return;

@@ -397,7 +397,13 @@
       box-shadow: var(--shadow);
       position:relative;
       overflow:hidden;
+      display:block;
+      text-decoration:none;
+      color:inherit;
+      cursor:pointer;
+      transition: transform .25s ease, box-shadow .25s ease;
     }
+    .work-card:hover{ transform: translateY(-4px); }
 
     /* Smaller screens: shrink the reel cards a touch (ratio stays 16:10) */
     @media (max-width: 900px){
@@ -1183,25 +1189,25 @@
       <div class="work-stage" aria-label="Work carousel stage">
         <h2 class="blog-title stories-title">STORIES</h2>
         <div class="work-carousel" id="workCarousel" aria-label="Work carousel" tabindex="0">
-          <article class="work-card" aria-label="Sunsets">
+          <a class="work-card" aria-label="Sunsets" href="stories/sunsets.html">
             <div class="work-media" style="background-image:url('assets/work.jpg')"></div>
             <span class="work-word">sunsets</span>
-          </article>
+          </a>
 
-          <article class="work-card" aria-label="Cars">
+          <a class="work-card" aria-label="Cars" href="stories/cars.html">
             <div class="work-media" style="background-image:url('assets/work2.jpg')"></div>
             <span class="work-word">cars</span>
-          </article>
+          </a>
 
-          <article class="work-card" aria-label="Concretes">
+          <a class="work-card" aria-label="Concretes" href="stories/concretes.html">
             <div class="work-media" style="background-image:url('assets/work3.jpg')"></div>
             <span class="work-word">concretes</span>
-          </article>
+          </a>
 
-          <article class="work-card" aria-label="Nature">
+          <a class="work-card" aria-label="Nature" href="stories/nature.html">
             <div class="work-media" style="background-image:url('assets/work4.jpg')"></div>
             <span class="work-word">nature</span>
-          </article>
+          </a>
         </div>
 
         <button class="work-prev" id="workPrev" type="button" aria-label="Previous work">&lt;</button>

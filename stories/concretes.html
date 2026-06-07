@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>fahadABIR | Concretes</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
+  <link rel="stylesheet" href="gallery.css" />
+</head>
+<body id="top">
+  <header class="site-nav" id="siteHeader">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="../index.html"><span>fahadABIR</span></a>
+      <div class="links" aria-label="Desktop links">
+        <a href="../index.html#reel">Stories</a>
+        <a href="../index.html#blog">Thoughts</a>
+        <a href="../index.html#contact">Contact</a>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
+        <span aria-hidden="true"></span>
+      </button>
+    </nav>
+    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
+      <a href="../index.html#reel">Stories</a>
+      <a href="../index.html#blog">Thoughts</a>
+      <a href="../index.html#contact">Contact</a>
+    </div>
+  </header>
+
+  <div class="gx-top">
+    <nav class="cat-nav" aria-label="Categories">
+        <a href="sunsets.html">sunsets</a>
+        <span class="dot">&middot;</span>
+        <a href="cars.html">cars</a>
+        <span class="dot">&middot;</span>
+        <a href="concretes.html" class="active">concretes</a>
+        <span class="dot">&middot;</span>
+        <a href="nature.html">nature</a>
+    </nav>
+  </div>
+
+  <main class="gallery" aria-label="Concretes gallery" data-folder="concretes" data-prefix="concrete"></main>
+
+  <footer class="gx-foot">
+    <span>&copy; 2026 Abir Hossain</span>
+    <span class="row"><a href="../index.html">home</a> <span class="dot">&middot;</span> <a href="#top">&uarr;</a></span>
+  </footer>
+
+  <script src="gallery.js"></script>
+  <script>
+    const header = document.getElementById('siteHeader');
+    let lastY = window.scrollY, ticking = false;
+    function onScroll(){
+      const y = window.scrollY, d = y - lastY;
+      if (d > 8 && y > 80){ header.classList.add('is-hidden'); closeMenu(); }
+      else if (d < -8){ header.classList.remove('is-hidden'); }
+      lastY = y; ticking = false;
+    }
+    window.addEventListener('scroll', () => { if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
+    const hamburger = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
+    function openMenu(){ mobileMenu.classList.add('open'); hamburger.setAttribute('aria-expanded','true'); hamburger.setAttribute('aria-label','Close menu'); }
+    function closeMenu(){ if(!mobileMenu) return; mobileMenu.classList.remove('open'); hamburger.setAttribute('aria-expanded','false'); hamburger.setAttribute('aria-label','Open menu'); }
+    function toggleMenu(){ mobileMenu.classList.contains('open') ? closeMenu() : openMenu(); }
+    hamburger?.addEventListener('click', (e) => { e.preventDefault(); toggleMenu(); });
+    mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMenu()));
+    document.addEventListener('click', (e) => {
+      if(!isPhone() || !mobileMenu.classList.contains('open')) return;
+      if(!(mobileMenu.contains(e.target) || hamburger.contains(e.target))) closeMenu();
+    });
+    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeMenu(); });
+  </script>
+</body>
+</html>

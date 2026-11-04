@@ -10,49 +10,13 @@
 <body id="top">
   <header class="site-nav" id="siteHeader">
     <nav class="nav" aria-label="Primary">
-      <div class="nav-top">
-        <a class="brand" href="../index.html"><span>fahadABIR</span></a>
-        <div class="links" aria-label="Desktop links">
-          <div class="nav-drop">
-            <a href="../index.html#reel">Stories</a>
-          </div>
-          <a href="../index.html#blog">Thoughts</a>
-          <a href="../index.html#contact">Contact</a>
-        </div>
-        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
-          <span aria-hidden="true"></span>
-        </button>
-      </div>
-      <div class="nav-expand" aria-label="Story categories">
-        <div class="nav-expand-inner">
-          <div class="nav-expand-pad">
-            <a href="sunsets.html">sunsets</a>
-            <a href="cars.html">cars</a>
-            <a href="concretes.html">concretes</a>
-            <a href="nature.html">nature</a>
-          </div>
-        </div>
-      </div>
+      <a class="nav-home" href="../index.html" aria-label="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M5 10.5 L12 5 L19 10.5 M7.5 9 V19 H16.5 V9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <button class="nav-more" id="navMore" type="button" aria-label="Open menu" aria-controls="menuRow" aria-expanded="false">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="6" cy="12" r="1.35" fill="currentColor"/><circle cx="12" cy="12" r="1.35" fill="currentColor"/><circle cx="18" cy="12" r="1.35" fill="currentColor"/></svg>
+      </button>
     </nav>
-    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
-      <div class="mm-group">
-        <div class="mm-row">
-          <a href="../index.html#reel" class="mm-link">Stories</a>
-          <button class="mm-toggle" id="mmStoriesToggle" aria-label="Show story categories" aria-expanded="false" aria-controls="mmStoriesSub">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-        <div class="mm-sub" id="mmStoriesSub">
-          <div class="mm-sub-inner">
-            <div class="mm-sub-pad">
-              <a href="sunsets.html">sunsets</a>
-              <a href="cars.html">cars</a>
-              <a href="concretes.html">concretes</a>
-              <a href="nature.html">nature</a>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="menu-row" id="menuRow">
+      <a href="../index.html#reel">Stories</a>
       <a href="../index.html#blog">Thoughts</a>
       <a href="../index.html#contact">Contact</a>
     </div>
@@ -72,48 +36,30 @@
 
   <main class="gallery" aria-label="Nature gallery" data-folder="nature" data-prefix="nature"></main>
 
-  <footer class="gx-foot">
-    <span>&copy; 2026 Abir Hossain</span>
-    <span class="row"><a href="../index.html">home</a> <span class="dot">&middot;</span> <a href="#top">&uarr;</a></span>
+  <footer class="site-footer" aria-label="Footer">
+    <span class="foot-copy">© 2026 Abir H</span>
+    <nav class="foot-links" aria-label="Legal">
+      <a href="#" id="tncOpen">T&amp;C</a>
+      <span class="foot-dot" aria-hidden="true">·</span>
+      <a href="#top" class="foot-top" aria-label="Back to top">↑</a>
+    </nav>
   </footer>
 
+  <div class="tnc-overlay" id="tncOverlay" role="dialog" aria-modal="true" aria-label="Terms &amp; Conditions" aria-hidden="true">
+    <div class="tnc-sheet">
+      <button class="tnc-close" id="tncClose" type="button" aria-label="Close">×</button>
+      <h3 class="tnc-title">Terms &amp; Conditions</h3>
+      <div class="tnc-body">
+        <p>Every photograph and word on this page is the property of Abir Hossain. Use of any content from this page, including copying, reproduction, redistribution, or commercial use, without my prior written agreement is strictly prohibited.</p>
+        <p>You’re welcome to view and share a link to this page. The images themselves may not be downloaded, edited, reposted, or used in any project without permission.</p>
+        <p>Licensing and print enquiries are handled case by case. Reach out via the contact links and we’ll sort something out.</p>
+        <p>All frames are shot and edited by me. Locations and capture details are shared in good faith and may be approximate.</p>
+        <p class="tnc-foot">© 2026 Abir Hossain. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
   <script src="gallery.js"></script>
-  <script>
-    const header = document.getElementById('siteHeader');
-    let lastY = window.scrollY, ticking = false;
-    function onScroll(){
-      const y = window.scrollY, d = y - lastY;
-      if (d > 8 && y > 80){ header.classList.add('is-hidden'); closeMenu(); }
-      else if (d < -8){ header.classList.remove('is-hidden'); }
-      lastY = y; ticking = false;
-    }
-    window.addEventListener('scroll', () => { if(!ticking){ requestAnimationFrame(onScroll); ticking = true; } }, { passive:true });
-    const hamburger = document.getElementById('hamburger');
-    const mobileMenu = document.getElementById('mobileMenu');
-    const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
-    function openMenu(){ mobileMenu.classList.add('open'); hamburger.setAttribute('aria-expanded','true'); hamburger.setAttribute('aria-label','Close menu'); }
-    function closeMenu(){ if(!mobileMenu) return; mobileMenu.classList.remove('open'); hamburger.setAttribute('aria-expanded','false'); hamburger.setAttribute('aria-label','Open menu'); }
-    function toggleMenu(){ mobileMenu.classList.contains('open') ? closeMenu() : openMenu(); }
-    hamburger?.addEventListener('click', (e) => { e.preventDefault(); toggleMenu(); });
-    mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', () => closeMenu()));
-    const mmStoriesToggle = document.getElementById('mmStoriesToggle');
-    const mmStoriesSub = document.getElementById('mmStoriesSub');
-    mmStoriesToggle?.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); const open = mmStoriesSub.classList.toggle('open'); mmStoriesToggle.setAttribute('aria-expanded', open ? 'true' : 'false'); });
-    (function(){
-      const nav = document.querySelector('.nav');
-      const drop = document.querySelector('.nav-drop');
-      const expand = document.querySelector('.nav-expand');
-      if (!nav || !drop || !expand) return;
-      function place(){ const dr = drop.getBoundingClientRect(); const er = expand.getBoundingClientRect(); nav.style.setProperty('--stories-left', (dr.left - er.left) + 'px'); }
-      place(); window.addEventListener('resize', place);
-      if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
-      setTimeout(place, 300);
-    })();
-    document.addEventListener('click', (e) => {
-      if(!isPhone() || !mobileMenu.classList.contains('open')) return;
-      if(!(mobileMenu.contains(e.target) || hamburger.contains(e.target))) closeMenu();
-    });
-    document.addEventListener('keydown', (e) => { if(e.key === 'Escape') closeMenu(); });
-  </script>
+  <script src="site.js"></script>
 </body>
 </html>

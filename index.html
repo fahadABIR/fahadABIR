@@ -298,6 +298,414 @@
       .nav{border-radius:999px !important}
     }
 
+    /* Split navbar: a round Home button on the left, the menu pill on the right */
+    .nav{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      padding:0;
+      border:none;
+      background:none;
+      backdrop-filter:none;
+      -webkit-backdrop-filter:none;
+      box-shadow:none;
+      border-radius:0 !important;
+      pointer-events:none;
+    }
+    .nav-home, .nav-pill{
+      pointer-events:auto;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,12,15,.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 10px 36px rgba(0,0,0,.35);
+    }
+    .nav-home{
+      flex:0 0 auto;
+      width:46px; height:46px;
+      border-radius:14px;
+      display:grid; place-items:center;
+      color:rgba(245,246,247,.5);
+      transition: color .2s ease, border-color .2s ease;
+    }
+    .nav-home:hover{ color:rgba(245,246,247,.9); border-color:rgba(255,255,255,.2); }
+    .nav-pill{
+      padding:5px 8px;
+      border-radius:14px;
+    }
+    .nav-pill .links a{ border-radius:10px; }
+    .nav-pill .nav-top{ justify-content:flex-end; }
+
+    /* One three-dot button on the right (all screen sizes); the menu expands from it */
+    .nav-pill{ padding:0 !important; border:none !important; background:none !important;
+               box-shadow:none !important; backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+    .nav .links, .nav .nav-expand{ display:none !important; }
+    .hamburger.nav-more{
+      display:inline-flex;
+      width:46px; height:46px;
+      border-radius:14px;
+      color:rgba(245,246,247,.6);
+      background:rgba(10,12,15,.55);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 10px 36px rgba(0,0,0,.35);
+      transition: color .2s ease, border-color .2s ease, background .2s ease;
+    }
+    .hamburger.nav-more:hover,
+    .hamburger.nav-more[aria-expanded="true"]{ color:rgba(245,246,247,.95); border-color:rgba(255,255,255,.2); }
+    .mobile-menu{
+      top: calc(14px + 46px + 10px);
+      left:auto;
+      right: max(var(--pad), calc((100vw - var(--max)) / 2));
+      width: min(280px, calc(100vw - var(--pad) * 2));
+      border-radius:14px;
+      transform-origin: top right;
+      transform: translateY(-4px) scale(.96);
+      transition: opacity .22s ease, transform .32s cubic-bezier(.22,1,.36,1);
+    }
+    .mobile-menu.open{ transform: none; }
+    .mobile-menu a, .mm-group{ border-radius:10px; }
+    @media (max-width: 700px){
+      .mobile-menu{ top: calc(12px + 46px + 10px); left: var(--pad); right: var(--pad); width:auto; }
+    }
+
+    /* Buttons live under the fahadABIR headline (bottom-left of the landing page) */
+    #content header{
+      position:relative;
+      inset:auto;
+      padding:0;
+      margin-top: clamp(22px, 3vh, 34px);
+      display:block;
+      pointer-events:auto;
+      transform:none !important;
+      opacity:1 !important;
+      z-index:5;
+    }
+    #content .nav{
+      width:auto;
+      justify-content:flex-start;
+      gap:8px;
+    }
+    #content .mobile-menu{
+      position:absolute;
+      top:auto;
+      bottom: calc(100% + 10px);
+      left:0;
+      right:auto;
+      width: min(280px, calc(100vw - var(--pad) * 2));
+      transform-origin: bottom left;
+      transform: translateY(4px) scale(.96);
+    }
+    #content .mobile-menu.open{ transform:none; }
+
+    /* Docked: once the landing buttons scroll up to the frame line, they pin inside
+       the glass frame — Home top-left, menu top-right. */
+    :root{ --dock-gap: clamp(14px, 1.6vw, 26px); --dock-in: calc(var(--dock-gap) + 16px); }
+    header.is-docked{
+      padding: var(--dock-in) var(--dock-in) 0;
+      animation: dockIn .45s ease both;
+    }
+    header.is-docked.is-hidden{ transform:none; opacity:1; }
+    header.is-docked .nav{ width:100%; max-width:none; justify-content:space-between; }
+    header.is-docked .mobile-menu{
+      top: calc(var(--dock-in) + 46px + 10px);
+      right: var(--dock-in);
+      left:auto;
+      width: min(280px, calc(100vw - var(--pad) * 2));
+    }
+    @media (max-width: 700px){
+      header.is-docked{ padding: 12px var(--pad) 0; }
+      header.is-docked .mobile-menu{ top: calc(12px + 46px + 10px); left: var(--pad); right: var(--pad); width:auto; }
+    }
+    @keyframes dockIn{ from{ opacity:0; } to{ opacity:1; } }
+
+    /* Menu: a single row that slides open sideways from the dots button —
+       to the RIGHT on the landing page, to the LEFT once docked in the frame.
+       The options are plain text, not buttons. */
+    #siteHeader .mobile-menu{
+      position:absolute;
+      top:0; bottom:auto; left:auto; right:auto;
+      width:auto; height:46px;
+      display:flex; align-items:center; gap:0;
+      padding:0 6px; margin:0;
+      white-space:nowrap;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(10,12,15,.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 10px 36px rgba(0,0,0,.35);
+      opacity:0;
+      pointer-events:none;
+      transform:none;
+      clip-path: inset(0 100% 0 0 round 14px);
+      transition: clip-path .55s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+    }
+    #siteHeader:not(.is-docked) .mobile-menu{ left:108px; }   /* just right of the dots */
+    #siteHeader .mobile-menu.open{
+      opacity:1; pointer-events:auto; transform:none;
+      clip-path: inset(0 0 0 0 round 14px);
+    }
+    #siteHeader.is-docked .mobile-menu{
+      top: var(--dock-in);
+      right: calc(var(--dock-in) + 54px);                    /* just left of the dots */
+      left:auto;
+      clip-path: inset(0 0 0 100% round 14px);
+      border:none;
+      box-shadow:none;
+      background:
+        radial-gradient(80% 90% at 50% 40%, rgba(255,255,255,.035) 0%, rgba(255,255,255,.012) 60%, rgba(255,255,255,0) 100%),
+        rgba(0,0,0,.16);
+      backdrop-filter: blur(6px) brightness(1.04);
+      -webkit-backdrop-filter: blur(6px) brightness(1.04);
+    }
+    #siteHeader.is-docked .mobile-menu.open{ clip-path: inset(0 0 0 0 round 14px); }
+    @media (max-width: 700px){
+      #siteHeader.is-docked .mobile-menu{ top:12px; right: calc(var(--pad) + 54px); }
+    }
+    /* flatten the old stacked layout into a row of text links */
+    #siteHeader .mm-group, #siteHeader .mm-row{ display:contents; }
+    #siteHeader .mm-toggle, #siteHeader .mm-sub{ display:none; }
+    #siteHeader .mobile-menu a,
+    #siteHeader .mobile-menu .mm-link{
+      display:inline-flex; align-items:center;
+      height:100%;
+      margin:0 !important;
+      padding:0 12px;
+      border:none; border-radius:0;
+      background:none;
+      color:rgba(245,246,247,.62);
+      font-size:11px;
+      letter-spacing:.16em;
+      text-transform:uppercase;
+      transition: color .2s ease;
+    }
+    #siteHeader .mobile-menu a:hover{ color:#fff; background:none; }
+    /* Over the Stories section (no glass behind them) the buttons get a hairline white outline */
+    header.is-docked.on-stories .nav-home,
+    header.is-docked.on-stories .hamburger.nav-more,
+    header.is-docked.on-stories .mobile-menu{
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.14) !important;
+      transition: box-shadow .4s ease, color .25s ease, background .3s ease, clip-path .55s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+    }
+    header.is-docked .nav-home,
+    header.is-docked .hamburger.nav-more{ transition: box-shadow .4s ease, color .25s ease, background .3s ease; }
+    /* Once out of the frame the glass lift is gone — only the hairline remains */
+    header.is-docked.on-stories .nav-home,
+    header.is-docked.on-stories .hamburger.nav-more{
+      background: rgba(255,255,255,.012) !important;
+      backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+    }
+    /* Melt: crossing between the frame and Stories, the glass buttons soften, sag like
+       molten glass, then re-form in their new state. */
+    header.melt .nav-home,
+    header.melt .hamburger.nav-more{
+      animation: glassMelt .9s cubic-bezier(.45,0,.2,1);
+      transform-origin: 50% 0%;
+    }
+    @keyframes glassMelt{
+      0%   { filter:none; transform:none; border-radius:14px; }
+      28%  { filter: blur(2px) brightness(1.18);
+             transform: translateY(2px) scale(1.07,.86);
+             border-radius: 42% 42% 30% 30% / 34% 34% 66% 66%; }
+      52%  { filter: blur(3.2px) brightness(1.08); opacity:.82;
+             transform: translateY(5px) scale(.9,1.14);
+             border-radius: 48% 48% 50% 50% / 38% 38% 62% 62%; }
+      78%  { filter: blur(.8px); opacity:1;
+             transform: translateY(-1px) scale(1.03,.97);
+             border-radius: 17px; }
+      100% { filter:none; transform:none; border-radius:14px; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      header.melt .nav-home, header.melt .hamburger.nav-more{ animation:none; }
+    }
+    /* Over the white Thoughts page the floating buttons switch to grey ink */
+    header.is-docked.on-light .nav-home,
+    header.is-docked.on-light .hamburger.nav-more{
+      color:#8C8C8C !important;
+      background: rgba(0,0,0,.02) !important;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08) !important;
+      backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+    }
+    header.is-docked.on-light .nav-home svg,
+    header.is-docked.on-light .hamburger.nav-more svg{ filter:none; }
+    header.is-docked.on-light .mobile-menu{
+      background: rgba(255,255,255,.85) !important;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08) !important;
+    }
+    #siteHeader.is-docked.on-light .mobile-menu a{ color:#959595; }
+    #siteHeader.is-docked.on-light .mobile-menu a:hover{ color:#666666; }
+    /* From Thoughts onward: both buttons stack on the left, centred vertically,
+       and stay there while scrolling; the menu slides out to the right. */
+    header.is-docked.side{
+      top:50%; bottom:auto; left:0; right:auto;
+      padding:0 0 0 var(--dock-in);
+      transform: translateY(-50%) !important;
+      opacity:1 !important;
+    }
+    header.is-docked.side .nav{
+      flex-direction:column;
+      width:auto;
+      gap:8px;
+    }
+    /* stacked on the left: the menu drops DOWN below the dots */
+    #siteHeader.is-docked.side .mobile-menu{
+      top: calc(46px + 8px + 46px + 8px);          /* just under the dots */
+      left: var(--dock-in);
+      right:auto;
+      height:auto;
+      flex-direction:column;
+      align-items:flex-start;
+      padding:6px 4px;
+      clip-path: inset(0 0 100% 0 round 14px);
+    }
+    #siteHeader.is-docked.side .mobile-menu.open{ clip-path: inset(0 0 0 0 round 14px); }
+    #siteHeader.is-docked.side .mobile-menu a,
+    #siteHeader.is-docked.side .mobile-menu .mm-link{ height:36px; width:100%; flex:none; }
+    @media (max-width: 700px){
+      /* Phones in Thoughts: Home on the left edge, menu on the right edge */
+      header.is-docked.side{ left:0; right:0; padding:0 10px; }
+      header.is-docked.side .nav{ flex-direction:row; width:100%; justify-content:space-between; }
+      #siteHeader.is-docked.side .mobile-menu{ left:auto; right:10px; top: calc(46px + 8px); }
+    }
+    /* Phones, over Stories: Home + menu side by side at the bottom centre
+       (they melt into place, same transition as big screens). */
+    @media (max-width: 700px){
+      header.is-docked.on-stories{
+        top:auto; bottom:28px; left:0; right:0;
+        padding:0;
+      }
+      header.is-docked.on-stories .nav{
+        width:100%;
+        justify-content:center;
+        gap:8px;
+      }
+      #siteHeader.is-docked.on-stories .mobile-menu{
+        top:auto; bottom: calc(46px + 10px);
+        left:50%; right:auto;
+        transform: translateX(-50%) !important;
+        clip-path: inset(100% 0 0 0 round 14px);
+      }
+      #siteHeader.is-docked.on-stories .mobile-menu.open{ clip-path: inset(0 0 0 0 round 14px); }
+    }
+    /* stack contents fade continuously with distance from the centre */
+    #storiesStage .st-card > *{ opacity: var(--c, 1) !important; }
+    /* black wash at the end of the photos (all screen sizes) */
+    .gal-fade-out{
+      position:absolute; inset:0;
+      bottom:-3px;          /* overlap the seam so no sliver of the last photo shows */
+      display:none;         /* phones only (see below) */
+      z-index:8;
+      pointer-events:none;
+      opacity:0;
+      background: linear-gradient(to top, #000305 0%, #000305 18%, rgba(0,3,5,.85) 45%, rgba(0,3,5,0) 100%);
+      will-change: opacity;
+    }
+    @media (max-width: 899px){ .gal-fade-out{ display:block; } }
+    /* Phones, Stories only: Home + menu as thick, very frosted glass tiles */
+    @media (max-width: 700px){
+      #siteHeader.is-docked.on-stories .nav-home,
+      #siteHeader.is-docked.on-stories .hamburger.nav-more{
+        border:none !important;
+        background:
+          radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 60%),
+          linear-gradient(180deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.08) 45%, rgba(255,255,255,.05) 100%) !important;
+        backdrop-filter: blur(88px) saturate(1.35) brightness(1.05) !important;
+        -webkit-backdrop-filter: blur(88px) saturate(1.35) brightness(1.05) !important;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.28),        /* softer lit top edge */
+          inset 0 3px 6px rgba(255,255,255,.06),      /* light pooling inside the slab */
+          inset 0 -4px 7px rgba(0,0,0,.32),           /* deep shaded underside = thickness */
+          inset 0 -1px 0 rgba(255,255,255,.07),       /* light caught on the bottom bevel */
+          inset 0 0 0 1.5px rgba(255,255,255,.12),    /* thicker glass rim */
+          inset 0 0 16px rgba(255,255,255,.05),
+          0 10px 24px rgba(0,0,0,.34),
+          0 2px 5px rgba(0,0,0,.22) !important;
+        color: rgba(245,246,247,.85) !important;
+      }
+    }
+    /* the last photo section never paints past its own bottom edge */
+    #workReveal4 .work-reveal-sticky{ clip-path: inset(0 0 1px 0); }
+    /* phones over Stories: frostier glass buttons */
+    @media (max-width: 700px){
+      header.is-docked.on-stories .nav-home,
+      header.is-docked.on-stories .hamburger.nav-more{
+        background: rgba(255,255,255,.07) !important;
+        backdrop-filter: blur(18px) saturate(1.3) !important;
+        -webkit-backdrop-filter: blur(18px) saturate(1.3) !important;
+      }
+      #siteHeader.is-docked.on-stories .mobile-menu{
+        background: rgba(20,22,26,.45);
+        backdrop-filter: blur(18px) saturate(1.3);
+        -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      }
+    }
+    /* while the buttons drop: one GPU layer each, no live blur repaint */
+    #siteHeader.dropping .nav-home,
+    #siteHeader.dropping .hamburger.nav-more{
+      will-change: transform;
+      backdrop-filter:none !important; -webkit-backdrop-filter:none !important;
+      background: rgba(120,124,130,.55) !important;
+      transition:none !important;
+    }
+    /* intro loader */
+    html.intro-on, html.intro-on body{ overflow:hidden; }
+    .intro{
+      position:fixed; inset:0; z-index:10000;
+      display:grid; place-items:center;
+      background: linear-gradient(to bottom, #001829 0%, #001829 28%, #000305 78%, #000305 100%);
+      transition: opacity .6s ease, visibility .6s ease;
+    }
+    .intro.done{ opacity:0; visibility:hidden; }
+    .intro-zoom{ width: min(360px, 78vw); }
+    .intro .wr-zoom-thumb{ left:6%; }
+    /* dots turn upright while the menu is open */
+    .hamburger.nav-more svg{ transition: transform .45s cubic-bezier(.22,1,.36,1); }
+    .hamburger.nav-more[aria-expanded="true"] svg{ transform: rotate(90deg); }
+    @media (max-width: 700px){
+      #siteHeader .mobile-menu{ padding:0 4px; }
+      #siteHeader .mobile-menu a,
+      #siteHeader .mobile-menu .mm-link{ padding:0 7px; font-size:10px; letter-spacing:.1em; }
+    }
+
+    /* Buttons as raised bumps in the glass: no border — just a convex surface that
+       catches light on its upper edge and falls into soft shadow below. */
+    header.is-docked .nav-home, header.is-docked .hamburger.nav-more{
+      border:none !important;
+      box-shadow:none !important;
+      /* the glass swells ever so slightly: a soft lift of light that fades to nothing
+         at the edges, so there is no outline at all */
+      background:
+        radial-gradient(70% 70% at 50% 40%, rgba(255,255,255,.04) 0%, rgba(255,255,255,.015) 55%, rgba(255,255,255,0) 100%) !important;
+      backdrop-filter: brightness(1.06) !important;
+      -webkit-backdrop-filter: brightness(1.06) !important;
+      transition: color .25s ease, background .3s ease;
+    }
+    /* a faint ghost of the icon beneath the glass */
+    header.is-docked .nav-home svg, header.is-docked .hamburger.nav-more svg{
+      filter: drop-shadow(0 3px 1.2px rgba(245,246,247,.09));
+    }
+    header.is-docked .nav-home:hover, header.is-docked .hamburger.nav-more:hover,
+    header.is-docked .hamburger.nav-more[aria-expanded="true"]{
+      background:
+        radial-gradient(70% 70% at 50% 40%, rgba(255,255,255,.06) 0%, rgba(255,255,255,.02) 55%, rgba(255,255,255,0) 100%) !important;
+    }
+    @media (max-width: 700px){
+      .nav-pill{ padding:0; border:none; background:none; box-shadow:none;
+                 backdrop-filter:none; -webkit-backdrop-filter:none; }
+      .hamburger{
+        width:46px; height:46px;
+        border-radius:14px;
+        background:rgba(10,12,15,.55);
+        border-color:rgba(255,255,255,.12);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 10px 36px rgba(0,0,0,.35);
+      }
+    }
+
     /* Hero */
     .card{
       width:min(var(--max), 100%);
@@ -450,6 +858,125 @@
       .hero-anim-svg .shape-camera *,
       .hero-anim-svg .shape-frame *{ display:none; }
       .hero-coords .coords-num.is-typing::after{ animation: none; }
+    }
+
+    /* STORIES — left label, right 3D vertical stack (wheel on the right half flips stories) */
+    .panel.stories{padding:0; height:100vh; min-height:100vh; overflow:hidden}
+    .panel.stories::before{display:none}
+    .stories-left{
+      position:absolute; left:0; top:0; bottom:0; width:50%;
+      display:flex; align-items:center;
+      padding-left: clamp(24px, 17vw, 340px);
+      z-index:2;
+    }
+    .stories-heading{
+      margin:0;
+      font-size: clamp(34px, 3.4vw, 52px);
+      font-weight: 600;
+      letter-spacing: .12em;
+      line-height:1;
+      color: var(--fg);
+    }
+    .stories-right{
+      position:absolute; right:0; top:0; bottom:0; width:50%;
+      perspective: 1600px;
+      outline:none;
+      z-index:2;
+      --card-w: min(460px, 38vw);
+      --card-h: min(460px, 56vh);
+    }
+    .st-card{
+      position:absolute; left:50%; top:50%;
+      width: var(--card-w); height: var(--card-h);
+      margin-left: calc(var(--card-w) / -2);
+      margin-top: calc(var(--card-h) / -2);
+      border-radius: 28px;
+      background: var(--tint);
+      color:#14202b;
+      text-decoration:none;
+      display:flex; flex-direction:column;
+      padding: clamp(22px, 2.4vw, 40px);
+      transform-origin: center;
+      transition: transform .75s cubic-bezier(.2,.8,.2,1), opacity .5s ease, background-color .5s ease;
+      will-change: transform;
+    }
+    .st-card > *{ transition: opacity .35s ease; }
+    .st-media{
+      width:100%;
+      aspect-ratio: 16 / 10;
+      margin: auto 0;
+      border-radius: 4px;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 22px 40px rgba(20,32,43,.22);
+    }
+    .st-label{ font-size: 20px; font-weight: 500; letter-spacing: -.005em; }
+    /* album slideshow inside each Stories card: two stacked layers cross-fade */
+    .st-media{ position:relative; overflow:hidden; }
+    .st-media > i{
+      position:absolute; inset:0;
+      background-size:cover; background-position:center;
+      opacity:0;
+      transform: scale(1.05);
+      filter: blur(6px);
+      transition: opacity .7s cubic-bezier(.45,0,.55,1), transform 1.2s cubic-bezier(.22,1,.36,1), filter .7s ease;
+      will-change: opacity, transform;
+    }
+    /* soft focus-pull: the new photo sharpens and settles in while the old one
+       blurs away underneath it */
+    .st-media > i.on{ opacity:1; transform: scale(1); filter: blur(0); }
+
+    .st-card[data-pos="0"]{ transform: none; z-index:3; }
+    .st-card[data-pos="-1"]{ transform: translateY(calc(var(--card-h) * -.8)) rotateX(62deg) scale(.92); z-index:2; }
+    .st-card[data-pos="1"]{ transform: translateY(calc(var(--card-h) * .8)) rotateX(-62deg) scale(.92); z-index:2; }
+    .st-card[data-pos="-2"], .st-card[data-pos="-far"]{ transform: translateY(calc(var(--card-h) * -1)) rotateX(80deg) scale(.85); opacity:0; pointer-events:none; }
+    .st-card[data-pos="2"], .st-card[data-pos="far"]{ transform: translateY(calc(var(--card-h) * 1)) rotateX(-80deg) scale(.85); opacity:0; pointer-events:none; }
+    .st-card:not([data-pos="0"]){ background: rgba(255,255,255,.07); cursor:pointer; }
+    .st-card:not([data-pos="0"]) > *{ opacity:0; }
+
+    .st-dots{
+      position:absolute; right: clamp(12px, 4vw, 90px); top:50%;
+      transform: translateY(-50%);
+      display:flex; flex-direction:column; gap:2px;
+      z-index:4;
+    }
+    .st-dot{
+      appearance:none; border:0; background:transparent; padding:0;
+      width:14px; height:14px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .st-dot::before{
+      content:""; width:4px; height:4px; border-radius:50%;
+      background: rgba(245,246,247,.3);
+      transition: background .3s ease, transform .3s ease;
+    }
+    .st-dot.active::before{ background: var(--fg); transform: scale(1.25); }
+
+    @media (max-width: 800px){
+      .stories-left{
+        width:100%; bottom:auto; top: calc(var(--pad) + 64px);
+        padding: 0 var(--pad); justify-content:center;
+      }
+      .stories-heading{ font-size: 20px; font-weight:500; letter-spacing:.14em; text-align:center; }
+      .panel.stories .stories-left{ top: 30px; }
+      /* Phone: one square card centred, stacked layers peeking top & bottom */
+      .stories-right{
+        width:100%; top:0; bottom:0;
+        perspective: 1100px;
+        --card-w: min(72vw, 340px);
+        --card-h: var(--card-w);
+      }
+      .st-card{ border-radius: 24px; padding: 20px 20px 22px; }
+      .st-label{ font-size: 16px; }
+      .st-card[data-pos="-1"]{ transform: translateY(calc(var(--card-h) * -1.12)) rotateX(64deg) scale(.94); }
+      .st-card[data-pos="1"]{ transform: translateY(calc(var(--card-h) * 1.12)) rotateX(-64deg) scale(.94); }
+      .st-card[data-pos="-2"]{ transform: translateY(calc(var(--card-h) * -1.32)) rotateX(70deg) scale(.94); opacity:1; }
+      .st-card[data-pos="2"]{ transform: translateY(calc(var(--card-h) * 1.32)) rotateX(-70deg) scale(.94); opacity:1; }
+      .st-card[data-pos="-2"], .st-card[data-pos="2"]{ background: rgba(255,255,255,.045); }
+      .st-dots{ right: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce){
+      .st-card{ transition: opacity .2s ease, background-color .2s ease; }
     }
 
     /* WORK (carousel, full screen) */
@@ -834,6 +1361,115 @@
       transform: translateZ(0);
     }
 
+    /* ---- Big screens: one pinned glass frame; pictures slide to the next INSIDE it ---- */
+    .gal-stage{ display:none; }
+    @media (min-width: 900px){
+      .works{ position:relative; }
+      .gal-stage{
+        display:block;
+        position:sticky; top:0;
+        height:100vh;
+        z-index:3;
+        background:#001829;           /* same blue as the top of the landing page */
+        --gal-pad: clamp(14px, 1.6vw, 26px);
+        --gal-radius: 26px;
+      }
+      /* first section slides under the stage so the stage overlays the scroll-length
+         sections, while the stage's own box still ends exactly where the works end */
+      .works > .work-reveal:first-of-type{ margin-top:-100vh; }
+      .works .work-reveal-sticky{ display:none; }   /* content lives in the frame now */
+      .gal-viewport{
+        position:absolute; inset: var(--gal-pad);
+        border-radius: var(--gal-radius);
+        overflow:hidden;
+        isolation:isolate;
+        transform: translateZ(0);
+      }
+      .gal-viewport .wr-desktop{
+        background:#001829;
+        will-change: transform;
+        backface-visibility:hidden;
+      }
+      .gal-viewport .wr-glass{
+        height: min(80vh, calc(100vh - var(--gal-pad) * 2 - 9vh));
+      }
+      /* very faint mirror of the picture and caption card, as if resting on glass
+         (only the lowest sliver is reflected, fading out fast) */
+      .gal-viewport .wr-glass{
+        -webkit-box-reflect: below 10px linear-gradient(to bottom, transparent 86%, rgba(255,255,255,.10) 100%);
+      }
+      .gal-viewport .wr-card{
+        -webkit-box-reflect: below 8px linear-gradient(to bottom, transparent 72%, rgba(255,255,255,.09) 100%);
+      }
+      /* black wash that joins the landing page's black bottom to the blue, and
+         fades away as the frame settles into place */
+      .gal-fade{
+        position:absolute; inset:0;
+        z-index:6;
+        pointer-events:none;
+        background: linear-gradient(to bottom, #000305 0%, #000305 18%, rgba(0,3,5,.85) 45%, rgba(0,3,5,0) 100%);
+        opacity:1;
+        will-change: opacity;
+      }
+      /* The tint lives on this layer so a real hole can be cut out of it: through the
+         hole you see the scene WITHOUT the tint, exactly like a hole in smoked glass. */
+      .gal-frame::before{
+        content:""; position:absolute; inset:0; border-radius:inherit;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,0) 22%,
+                                  rgba(255,255,255,0) 78%, rgba(255,255,255,.03) 100%),
+          radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,.22) 0%, rgba(0,0,0,.42) 100%);
+        -webkit-mask: radial-gradient(circle at calc(100% - 52px) calc(100% - 52px), transparent 28px, #000 28.6px);
+                mask: radial-gradient(circle at calc(100% - 52px) calc(100% - 52px), transparent 28px, #000 28.6px);
+      }
+      /* Only the cut edge is drawn: the far (lower) wall of the hole catches a little
+         light, the near (upper) wall sits in shadow — that is the glass thickness. */
+      .gal-hole{
+        position:absolute;
+        right: calc(var(--gal-pad) + 25px);
+        bottom: calc(var(--gal-pad) + 25px);
+        width:56px; height:56px;
+        border-radius:50%;
+        z-index:6;
+        display:grid; place-items:center;
+        color: rgba(245,246,247,.7);
+        text-decoration:none;
+        background: transparent;
+        box-shadow:
+          inset 0 1.5px 2px rgba(0,0,0,.45),
+          inset 0 -1px 0 rgba(255,255,255,.12),
+          0 0 0 .5px rgba(255,255,255,.10);
+        transition: color .3s ease;
+      }
+      /* picture dots, same as the Stories dots, inside the frame on the right */
+      .gal-dots{
+        position:absolute;
+        right: calc(var(--gal-pad) + 22px);
+        top:50%; transform: translateY(-50%);
+        display:flex; flex-direction:column; gap:2px;
+        z-index:6;
+      }
+      .gal-hole svg{ transition: transform .35s cubic-bezier(.2,.8,.2,1); }
+      .gal-hole:hover{ color: rgba(245,246,247,.98); }
+      .gal-hole:hover svg{ transform: translateY(2px); }
+      .gal-hole:focus-visible{ outline: 1px solid rgba(255,255,255,.5); outline-offset: 8px; }
+
+      /* the transparent glass pane sitting over the pictures */
+      .gal-frame{
+        position:absolute; inset: var(--gal-pad);
+        border-radius: var(--gal-radius);
+        pointer-events:none;
+        z-index:5;
+        border:1px solid rgba(255,255,255,.14);
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.22),
+          inset 0 0 0 7px rgba(255,255,255,.025),
+          inset 0 0 48px rgba(255,255,255,.035),
+          0 0 0 1px rgba(0,0,0,.45),
+          0 24px 80px rgba(0,0,0,.55);
+      }
+    }
+
     @media (prefers-reduced-motion: reduce){
       .wr-glass-fill{ clip-path: none !important; }
       .wr-glass{ --ring: 0; }
@@ -966,6 +1602,155 @@
     .blog-next:hover,.blog-prev:hover{background: rgba(10,12,15,.28); border-color: rgba(255,255,255,.26)}
     .blog-next:active,.blog-prev:active{transform: translateY(1px)}
     .blog-prev[hidden]{display:none}
+
+    /* Thoughts: clean white page with soft greys (palette from the reference) */
+    #blog .old-paper{ background:#FFFFFF; background-image:none; filter:none; }
+    #blog .blog-title{ color:#B3B3B3; }
+    #blog .blog-card{
+      background:#EFEFF0;
+      border:none;
+      backdrop-filter:none; -webkit-backdrop-filter:none;
+      color:#666666;
+    }
+    #blog .blog-card h3, #blog .blog-card .headline{ color:#666666; }
+    #blog .blog-card .byline, #blog .blog-card .snippet{ color:#959595; }
+    #blog .blog-next, #blog .blog-prev{
+      background:#EFEFF0; border:none;
+      backdrop-filter:none; -webkit-backdrop-filter:none;
+      color:#666666;
+    }
+    #blog .blog-next:hover, #blog .blog-prev:hover{ background:#E6E6E7; }
+
+    @media (max-width: 899px){
+      header.is-docked .nav, .gal-rail, .gal-dots, .gal-hole{
+        opacity: var(--ui-op, 1);
+        transition: opacity .18s ease;
+      }
+    }
+    /* Phones: no frame — just a tiny glass bar on the right, over the photos,
+       holding the picture dots and the down arrow to the next section. */
+    .gal-rail{ display:none; }
+    @media (max-width: 899px){
+      .works{ position:relative; }
+      .gal-stage{
+        display:block;
+        position:sticky; top:0;
+        height:100vh;
+        z-index:3;
+        background:transparent;
+        pointer-events:none;
+      }
+      .works > .work-reveal:first-of-type{ margin-top:-100vh; }
+      .gal-viewport, .gal-frame, .gal-fade{ display:none; }
+      .gal-rail{
+        display:block;
+        position:absolute;
+        right:10px; top:50%;
+        width:26px; height:118px;
+        transform: translateY(-50%);
+        border-radius:13px;
+        background: rgba(255,255,255,.07);
+        backdrop-filter: blur(10px) saturate(1.3);
+        -webkit-backdrop-filter: blur(10px) saturate(1.3);
+        box-shadow:
+          inset 0 0 0 .5px rgba(255,255,255,.18),
+          inset 0 1px 0 rgba(255,255,255,.18),
+          0 4px 14px rgba(0,0,0,.18);
+      }
+      .gal-dots{
+        position:absolute;
+        display:flex; flex-direction:column; gap:2px;
+        right:16px;
+        top: calc(50% - 59px + 10px);
+        transform:none;
+        pointer-events:auto;
+        z-index:7;
+      }
+      .gal-hole{
+        position:absolute;
+        display:grid; place-items:center;
+        text-decoration:none;
+        right:12px;
+        top: calc(50% + 59px - 10px - 22px);
+        bottom:auto;
+        width:22px; height:22px;
+        box-shadow:none;
+        background:none;
+        color: rgba(245,246,247,.75);
+        pointer-events:auto;
+        z-index:7;
+      }
+      .gal-hole svg{ width:15px; height:15px; }
+    }
+
+    /* Frosted strip on the left, behind the floating buttons: cards scrolling
+       left slide under it and soften away. */
+    #blog .blog-fog{
+      position:absolute; top:0; bottom:0; left:0;
+      width: calc(var(--dock-in) + 46px + 110px);
+      z-index:3;
+      pointer-events:none;
+      background: linear-gradient(to right, rgba(255,255,255,.72) 0%, rgba(255,255,255,.5) 55%, rgba(255,255,255,0) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      -webkit-mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+              mask-image: linear-gradient(to right, #000 0%, #000 55%, transparent 100%);
+    }
+    @media (max-width: 700px){
+      /* phones: no frosted strip, the buttons just sit on the edges */
+      #blog .blog-fog{ display:none; }
+    }
+
+    /* Thought cards: huge faint number on the left, title / date / text on the right */
+    #blog{ --blog-card-w: clamp(320px, 48vw, 690px); }
+    #blog .blog-card.tc{
+      position:relative;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      align-items:center;
+      gap: clamp(16px, 3vw, 40px);
+      aspect-ratio: 1.72 / 1;
+      min-height:0;
+      padding: clamp(22px, 3vw, 36px);
+      border-radius:14px;
+      overflow:hidden;
+    }
+    #blog .tc-num{
+      font-size: clamp(110px, 14vw, 232px);
+      font-weight:200;
+      line-height:.8;
+      letter-spacing:-.06em;
+      background: linear-gradient(180deg, #E3E3E4 0%, #E7E7E8 55%, #EFEFF0 100%);
+      -webkit-background-clip:text; background-clip:text;
+      color:transparent; -webkit-text-fill-color:transparent;
+      user-select:none;
+    }
+    #blog .tc-body{ align-self:center; }
+    #blog .tc-title{
+      margin:0;
+      font-size: clamp(18px, 1.9vw, 26px);
+      font-weight:450;
+      line-height:1.18;
+      letter-spacing:-.01em;
+      color:#666666;
+    }
+    #blog .tc-date{
+      margin:8px 0 0;
+      font-size:12px;
+      letter-spacing:.04em;
+      color:#B3B3B3;
+    }
+    #blog .tc-text{
+      margin: clamp(18px, 2.4vw, 28px) 0 0;
+      font-size: clamp(13px, 1.1vw, 15px);
+      line-height:1.4;
+      color:#959595;
+    }
+    @media (max-width: 600px){
+      #blog{ --blog-card-w: 84vw; }
+      #blog .blog-card.tc{ aspect-ratio:auto; min-height:260px; grid-template-columns: .8fr 1.2fr; gap:12px; }
+      #blog .tc-num{ font-size: 96px; }
+    }
 
     .blog-next.all{
       width:auto;
@@ -1131,61 +1916,62 @@
 </head>
 
 <body>
+  <!-- 2s intro loader: the lens zoom scale runs 0 → 100, then fades into the landing page -->
+  <div class="intro" id="intro" role="progressbar" aria-label="Loading" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="intro-zoom">
+      <div class="wr-zoom-track"><span class="wr-zoom-thumb" id="introThumb"><span class="wr-zoom-val" id="introVal">0</span></span></div>
+      <div class="wr-zoom-labels"><span>0</span><span>25</span><span>50</span><span>75</span><span>100</span></div>
+    </div>
+  </div>
+  <script>
+    (function intro(){
+      var el = document.getElementById('intro'), th = document.getElementById('introThumb'), v = document.getElementById('introVal');
+      document.documentElement.classList.add('intro-on');
+      var D = 2000, t0 = null;
+      // Realistic but calm loading: a smooth run with a few very gentle changes of
+      // pace (no stops), slightly different on each visit; always 100 at 2s.
+      // "fast website": shoots most of the way almost instantly, eases through
+      // the last few percent, then snaps to 100
+      var xs = [0, .06, .16, .3, .5, .7, .86, 1];
+      var ys = [0, 26, 61, 78, 87, 93, 97, 100];
+      for (var i = 2; i < ys.length - 1; i++) ys[i] += (Math.random() - .5) * 2;
+      // monotone cubic (Fritsch–Carlson): smooth, never goes backwards, no stalls
+      var n = xs.length, d = [], m = [];
+      for (i = 0; i < n - 1; i++) d[i] = (ys[i+1] - ys[i]) / (xs[i+1] - xs[i]);
+      m[0] = d[0] * .8; m[n-1] = d[n-2] * 1.6;             // quick start, quick finish
+      for (i = 1; i < n - 1; i++) m[i] = (d[i-1] * d[i] <= 0) ? 0 : (d[i-1] + d[i]) / 2;
+      for (i = 0; i < n - 1; i++){
+        var al = m[i] / d[i], be = m[i+1] / d[i], h2 = al*al + be*be;
+        if (h2 > 9){ var tt = 3 / Math.sqrt(h2); m[i] = tt*al*d[i]; m[i+1] = tt*be*d[i]; }
+      }
+      var ease = function(k){
+        for (var j = 0; j < n - 1; j++){
+          if (k <= xs[j+1]){
+            var h = xs[j+1] - xs[j], u = (k - xs[j]) / h, u2 = u*u, u3 = u2*u;
+            var y = (2*u3 - 3*u2 + 1)*ys[j] + (u3 - 2*u2 + u)*h*m[j] + (-2*u3 + 3*u2)*ys[j+1] + (u3 - u2)*h*m[j+1];
+            return Math.max(0, Math.min(100, y)) / 100;
+          }
+        }
+        return 1;
+      };
+      function f(t){
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / D), e = ease(k), n = Math.round(e * 100);
+        th.style.left = (6 + e * 88) + '%';
+        v.textContent = n;
+        el.setAttribute('aria-valuenow', n);
+        if (k < 1) requestAnimationFrame(f);
+        else setTimeout(function(){
+          el.classList.add('done');
+          document.documentElement.classList.remove('intro-on');
+          setTimeout(function(){ el.remove(); }, 700);
+        }, 120);
+      }
+      requestAnimationFrame(f);
+    })();
+  </script>
   <a class="skip" href="#content">Skip to content</a>
 
-  <header id="siteHeader">
-    <nav class="nav" aria-label="Primary">
-      <div class="nav-top">
-        <a class="brand" href="#top"><span>fahadABIR</span></a>
-
-        <div class="links" aria-label="Desktop links">
-          <div class="nav-drop">
-            <a href="#reel">Stories</a>
-          </div>
-          <a href="#blog">Thoughts</a>
-          <a href="#contact">Contact</a>
-        </div>
-
-        <button class="hamburger" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
-          <span aria-hidden="true"></span>
-        </button>
-      </div>
-
-      <div class="nav-expand" aria-label="Story categories">
-        <div class="nav-expand-inner">
-          <div class="nav-expand-pad">
-            <a href="stories/sunsets.html">sunsets</a>
-            <a href="stories/cars.html">cars</a>
-            <a href="stories/concretes.html">concretes</a>
-            <a href="stories/nature.html">nature</a>
-          </div>
-        </div>
-      </div>
-    </nav>
-
-    <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
-      <div class="mm-group">
-        <div class="mm-row">
-          <a href="#reel" class="mm-link">Stories</a>
-          <button class="mm-toggle" id="mmStoriesToggle" aria-label="Show story categories" aria-expanded="false" aria-controls="mmStoriesSub">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </button>
-        </div>
-        <div class="mm-sub" id="mmStoriesSub">
-          <div class="mm-sub-inner">
-            <div class="mm-sub-pad">
-              <a href="stories/sunsets.html">sunsets</a>
-              <a href="stories/cars.html">cars</a>
-              <a href="stories/concretes.html">concretes</a>
-              <a href="stories/nature.html">nature</a>
-            </div>
-          </div>
-        </div>
-      </div>
-      <a href="#blog">Thoughts</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </header>
 
   <main id="top">
     <!-- HERO -->
@@ -1228,11 +2014,87 @@
       </div>
 
       <div class="card" id="content">
-        <h1>Quiet images.<br/>Loud feelings.</h1>
+        <h1 style="display:inline-block; background:linear-gradient(100deg, #FFFFFF 0%, #F1F1EE 38%, #B9BCC0 62%, #7E838A 100%); -webkit-background-clip:text; background-clip:text; color:transparent; -webkit-text-fill-color:transparent;">fahadABIR</h1>
+      <header id="siteHeader">
+        <nav class="nav" aria-label="Primary">
+          <a class="brand nav-home" href="#top" aria-label="Home"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true"><path d="M5 10.5 L12 5 L19 10.5 M7.5 9 V19 H16.5 V9" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+
+          <div class="nav-pill">
+          <div class="nav-top">
+            <div class="links" aria-label="Desktop links">
+              <div class="nav-drop">
+                <a href="#reel">Stories</a>
+              </div>
+              <a href="#blog">Thoughts</a>
+              <a href="#contact">Contact</a>
+            </div>
+
+            <button class="hamburger nav-more" id="hamburger" aria-label="Open menu" aria-controls="mobileMenu" aria-expanded="false">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><circle cx="6" cy="12" r="1.35" fill="currentColor"/><circle cx="12" cy="12" r="1.35" fill="currentColor"/><circle cx="18" cy="12" r="1.35" fill="currentColor"/></svg>
+            </button>
+          </div>
+
+          <div class="nav-expand" aria-label="Story categories">
+            <div class="nav-expand-inner">
+              <div class="nav-expand-pad">
+                <a href="stories/sunsets.html">sunsets</a>
+                <a href="stories/cars.html">cars</a>
+                <a href="stories/concretes.html">concretes</a>
+                <a href="stories/nature.html">nature</a>
+              </div>
+            </div>
+          </div>
+          </div><!-- /nav-pill -->
+        </nav>
+
+        <div class="mobile-menu" id="mobileMenu" role="dialog" aria-label="Menu">
+          <div class="mm-group">
+            <div class="mm-row">
+              <a href="#reel" class="mm-link">Stories</a>
+              <button class="mm-toggle" id="mmStoriesToggle" aria-label="Show story categories" aria-expanded="false" aria-controls="mmStoriesSub">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="mm-sub" id="mmStoriesSub">
+              <div class="mm-sub-inner">
+                <div class="mm-sub-pad">
+                  <a href="stories/sunsets.html">sunsets</a>
+                  <a href="stories/cars.html">cars</a>
+                  <a href="stories/concretes.html">concretes</a>
+                  <a href="stories/nature.html">nature</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <a href="#blog">Thoughts</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </header>
       </div>
     </section>
 
     
+
+    <!-- WORKS — on big screens a pinned glass frame; pictures slide inside it -->
+    <div class="works" id="works">
+    <div class="gal-stage">
+      <div class="gal-viewport" id="galViewport"></div>
+      <div class="gal-frame" aria-hidden="true"></div>
+      <a class="gal-hole" href="#reel" aria-label="Skip to Stories">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+          <path d="M6.5 9.5 L12 15 L17.5 9.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+      <div class="gal-rail" aria-hidden="true"></div>
+      <div class="gal-dots" aria-label="Choose a picture">
+        <button class="st-dot" type="button" aria-label="Picture 1"></button>
+        <button class="st-dot" type="button" aria-label="Picture 2"></button>
+        <button class="st-dot" type="button" aria-label="Picture 3"></button>
+        <button class="st-dot" type="button" aria-label="Picture 4"></button>
+      </div>
+      <div class="gal-fade" id="galFade" aria-hidden="true"></div>
+      <div class="gal-fade-out" id="galFadeOut" aria-hidden="true"></div>
+    </div>
 
     <!-- WORK REVEAL 1 -->
     <section class="work-reveal" id="workReveal" aria-label="Work Reveal">
@@ -1317,38 +2179,41 @@
         </div>
       </div>
     </section>
+    </div><!-- /works -->
 
 
 <!-- WORK (carousel: 4 items) -->
-    <section class="panel work" id="reel" aria-label="Stories">
+    <section class="panel stories" id="reel" aria-label="Stories">
       <div class="bg" style="background:#000305"></div>
 
-      <div class="work-stage" aria-label="Work carousel stage">
-        <h2 class="blog-title stories-title">STORIES</h2>
-        <div class="work-carousel" id="workCarousel" aria-label="Work carousel" tabindex="0">
-          <a class="work-card" aria-label="Sunsets" href="stories/sunsets.html">
-            <div class="work-media" style="background-image:url('assets/work.jpg')"></div>
-            <span class="work-word">sunsets</span>
-          </a>
+      <div class="stories-left">
+        <h2 class="stories-heading">STORIES</h2>
+      </div>
 
-          <a class="work-card" aria-label="Cars" href="stories/cars.html">
-            <div class="work-media" style="background-image:url('assets/work3.jpg')"></div>
-            <span class="work-word">cars</span>
-          </a>
+      <div class="stories-right" id="storiesStage" tabindex="0" aria-roledescription="carousel" aria-label="Stories — scroll here to browse">
+        <a class="st-card" style="--tint:#F8E6C2" href="stories/sunsets.html">
+          <div class="st-media" style="background-image:url('assets/work.jpg')"></div>
+          <span class="st-label">Sunsets</span>
+        </a>
+        <a class="st-card" style="--tint:#DCE4EE" href="stories/cars.html">
+          <div class="st-media" style="background-image:url('assets/work3.jpg')"></div>
+          <span class="st-label">Cars</span>
+        </a>
+        <a class="st-card" style="--tint:#E8E4DE" href="stories/concretes.html">
+          <div class="st-media" style="background-image:url('assets/work4.jpg')"></div>
+          <span class="st-label">Concretes</span>
+        </a>
+        <a class="st-card" style="--tint:#DCE8D4" href="stories/nature.html">
+          <div class="st-media" style="background-image:url('assets/work2.jpg')"></div>
+          <span class="st-label">Nature</span>
+        </a>
+      </div>
 
-          <a class="work-card" aria-label="Concretes" href="stories/concretes.html">
-            <div class="work-media" style="background-image:url('assets/work4.jpg')"></div>
-            <span class="work-word">concretes</span>
-          </a>
-
-          <a class="work-card" aria-label="Nature" href="stories/nature.html">
-            <div class="work-media" style="background-image:url('assets/work2.jpg')"></div>
-            <span class="work-word">nature</span>
-          </a>
-        </div>
-
-        <button class="work-prev" id="workPrev" type="button" aria-label="Previous work">&lt;</button>
-        <button class="work-next" id="workNext" type="button" aria-label="Next work">&gt;</button>
+      <div class="st-dots" aria-label="Choose a story">
+        <button class="st-dot" type="button" aria-label="Sunsets"></button>
+        <button class="st-dot" type="button" aria-label="Cars"></button>
+        <button class="st-dot" type="button" aria-label="Concretes"></button>
+        <button class="st-dot" type="button" aria-label="Nature"></button>
       </div>
     </section>
         
@@ -1358,33 +2223,34 @@
     <section class="panel blog" id="blog" aria-label="Thoughts">
       <div class="bg old-paper"></div>
       <h2 class="blog-title">THOUGHTS</h2>
+      <div class="blog-fog" aria-hidden="true"></div>
 
       <div class="blog-stage">
         <div class="blog-carousel" id="blogCarousel" aria-label="Blog carousel">
-          <article class="blog-card" aria-label="Sheet 1">
-            <h3>Sheet 1</h3>
-            <p class="byline">Abir Hossain | December 5, 2025</p>
-            <div class="bottom">
-              <p class="headline">Haven't sat down yet</p>
-              <p class="snippet">The philosopher in me hasn't clocked in yet. Check back soon.</p>
+          <article class="blog-card tc" aria-label="Thought 01">
+            <span class="tc-num" aria-hidden="true">01</span>
+            <div class="tc-body">
+              <h3 class="tc-title">Haven't sat down yet</h3>
+              <p class="tc-date">December 5, 2025</p>
+              <p class="tc-text">The philosopher in me hasn't clocked in yet. Check back soon.</p>
             </div>
           </article>
 
-          <article class="blog-card" aria-label="Sheet 2">
-            <h3>Sheet 2</h3>
-            <p class="byline">Abir Hossain | December 5, 2025</p>
-            <div class="bottom">
-              <p class="headline">No Secrets</p>
-              <p class="snippet">Nothing hiding down here yet, keep an eye out</p>
+          <article class="blog-card tc" aria-label="Thought 02">
+            <span class="tc-num" aria-hidden="true">02</span>
+            <div class="tc-body">
+              <h3 class="tc-title">No Secrets</h3>
+              <p class="tc-date">December 5, 2025</p>
+              <p class="tc-text">Nothing hiding down here yet, keep an eye out</p>
             </div>
           </article>
 
-          <article class="blog-card" aria-label="Sheet 3">
-            <h3>Sheet 3</h3>
-            <p class="byline">Abir Hossain | December 5, 2025</p>
-            <div class="bottom">
-              <p class="headline">Page is here, the words aren't.</p>
-              <p class="snippet">I'm surprised you ignored the previous two LOL</p>
+          <article class="blog-card tc" aria-label="Thought 03">
+            <span class="tc-num" aria-hidden="true">03</span>
+            <div class="tc-body">
+              <h3 class="tc-title">Page is here, the words aren't.</h3>
+              <p class="tc-date">December 5, 2025</p>
+              <p class="tc-text">I'm surprised you ignored the previous two LOL</p>
             </div>
           </article>
         </div>
@@ -1541,7 +2407,6 @@
     });
 
     document.addEventListener('click', (e) => {
-      if (!isPhone()) return;
       if (!mobileMenu?.classList.contains('open')) return;
       const within = mobileMenu.contains(e.target) || hamburger?.contains(e.target);
       if (!within) closeMenu();
@@ -2026,6 +2891,13 @@
 
 
 
+        // Phones: Home, menu and the glass bar fade out with the lens bar as the
+        // photo fills the screen, then return together with the pop-up.
+        if (window.innerWidth < 900 && rect.top <= 0 && rect.bottom > vh * 0.5){
+          const ui = p < collapseEnd ? clamp01((collapseEnd - p) / 0.07) : 1;
+          document.documentElement.style.setProperty('--ui-op', ui.toFixed(3));
+        }
+
         // Once the popover appears, keep it stuck until the user scrolls
         // back up past the collapse threshold (so it doesn't flicker away
         // as you continue scrolling down through the section).
@@ -2055,7 +2927,9 @@
             dk.zoomThumb.style.left = `${(6 + (1 - fillP) * 88).toFixed(2)}%`;
             if (dk.zoomVal) dk.zoomVal.textContent = Math.round(v) + 'mm';
           }
-          const lo = clamp01((p - 0.03) / 0.16);      // gentle entrance for the caption
+          // Phones: the caption waits until the photo has fully opened (fill done at
+          // 70% of the scroll), then rises in. Big screens: gentle early entrance.
+          const lo = clamp01((p - 0.03) / 0.16);
           dk.left.style.opacity = lo.toFixed(3);
           dk.left.style.transform = `translateY(${((1 - lo) * 14).toFixed(1)}px)`;
         }
@@ -2128,10 +3002,89 @@
       }),
     ].filter(Boolean);
 
+    // Big-screen gallery: move each work's desktop layout into the pinned glass
+    // frame. As the next work's section scrolls in, its layer slides up INSIDE the
+    // frame while the current one eases up and dims — the frame itself never moves.
+    (function glassGallery(){
+      const vp = document.getElementById('galViewport');
+      if (!vp) return;
+      const sections = ['workReveal','workReveal2','workReveal3','workReveal4']
+        .map(id => document.getElementById(id)).filter(Boolean);
+      const layers = sections.map(s => {
+        const w = s.querySelector('.wr-desktop');
+        if (w) vp.appendChild(w);
+        return w;
+      });
+      const c01 = (v) => Math.max(0, Math.min(1, v));
+      const fade = document.getElementById('galFade');
+      const works = document.getElementById('works');
+      let raf = null;
+      const fadeOut = document.getElementById('galFadeOut');
+      function update(){
+        raf = null;
+        // Leaving the photos for Stories: a black wash rises from the bottom while the
+        // last photo is still up, so the edge meets Stories' black with no seam.
+        if (fadeOut && works){
+          const wb = works.getBoundingClientRect().bottom, vh0 = window.innerHeight;
+          fadeOut.style.opacity = c01((vh0 * 1.6 - wb) / (vh0 * 0.6)).toFixed(3);
+        }
+        if (window.innerWidth < 900) return;
+        const vh = window.innerHeight;
+        const tops = sections.map(s => s.getBoundingClientRect().top);
+        if (fade && works){
+          // Fully black while the frame is still rising (its top edge then matches the
+          // landing page's black bottom exactly); dissolves over the first 60vh once pinned.
+          const wt = works.getBoundingClientRect().top;
+          fade.style.opacity = c01(1 + wt / (vh * 0.6)).toFixed(3);
+        }
+        layers.forEach((L, i) => {
+          if (!L) return;
+          const enter = i === 0 ? 1 : 1 - c01(tops[i] / vh);               // 0 below → 1 in place
+          const leave = i < sections.length - 1 ? 1 - c01(tops[i + 1] / vh) : 0;
+          // No sliding: the current work fades away during the first half of the
+          // hand-off, then the next one fades in during the second half.
+          const op = Math.min(c01(enter * 2 - 1), 1 - c01(leave * 2));
+          L.style.transform = '';
+          L.style.opacity = op.toFixed(3);
+          L.style.visibility = op <= 0 ? 'hidden' : '';
+        });
+      }
+      // Dots: show which picture is up, click to glide to it
+      const dots = Array.from(document.querySelectorAll('.gal-dots .st-dot'));
+      dots.forEach((b, i) => b.addEventListener('click', () => {
+        const s = sections[i]; if (!s) return;
+        const y = s.getBoundingClientRect().top + window.scrollY;
+        if (window.__glide) window.__glide.scrollTo(y); else window.scrollTo({ top: y, behavior: 'smooth' });
+      }));
+      function updateDots(){
+        const half = window.innerHeight / 2;
+        let a = 0;
+        sections.forEach((s, i) => { if (s.getBoundingClientRect().top <= half) a = i; });
+        dots.forEach((b, i) => {
+          b.classList.toggle('active', i === a);
+          b.setAttribute('aria-current', i === a ? 'true' : 'false');
+        });
+      }
+      const _update = update;
+      update = function(){ _update(); updateDots(); };
+      const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+      window.addEventListener('scroll', schedule, { passive:true });
+      window.addEventListener('resize', schedule, { passive:true });
+      update();
+    })();
+
     function scheduleAllReveals(){ revealControllers.forEach(c => c.schedule()); }
     function closeAllReveals(){ revealControllers.forEach(c => c.close()); }
 
     window.addEventListener('scroll', scheduleAllReveals, { passive:true });
+    // Outside the photos section the phone buttons are always fully visible.
+    window.addEventListener('scroll', () => {
+      const w = document.getElementById('works');
+      if (!w) return;
+      const r = w.getBoundingClientRect();
+      if (r.top > 0 || r.bottom < window.innerHeight)
+        document.documentElement.style.setProperty('--ui-op', '1');
+    }, { passive:true });
 
     window.addEventListener('resize', () => {
       closePopover();
@@ -2174,6 +3127,496 @@
       centerBandTitle('reel', '.stories-title', '.work-card');
       centerBandTitle('blog', '.blog-title', '.blog-card');
     }
+
+    // Glide: inertial smooth scrolling for mouse wheels. Each wheel notch moves a
+    // target; the page eases toward it every frame, so scrolling feels like gliding.
+    // Touch devices keep their native scrolling; reduced-motion users are left alone.
+    (function glide(){
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const root = document.documentElement;
+      root.style.scrollBehavior = 'auto';      // per-frame scrollTo must be instant
+
+      const EASE = 0.065;   // lower = slower, silkier glide
+      const SPEED = 1;      // distance per wheel notch multiplier
+
+      let target = window.scrollY, current = window.scrollY, raf = null, last = 0;
+      const maxY = () => Math.max(0, root.scrollHeight - window.innerHeight);
+      const clampY = (y) => Math.max(0, Math.min(maxY(), y));
+
+      function frame(t){
+        // Something else (scrollbar drag, keyboard) moved the page: hand over.
+        if (Math.abs(window.scrollY - current) > 3){ stop(); return; }
+        const dt = last ? Math.min(64, t - last) : 16.67; last = t;
+        const k = 1 - Math.pow(1 - EASE, dt / 16.67);
+        current += (target - current) * k;
+        if (Math.abs(target - current) < 0.4) current = target;
+        window.scrollTo(0, current);
+        if (current !== target) raf = requestAnimationFrame(frame);
+        else { raf = null; last = 0; }
+      }
+      function start(){ if (!raf){ last = 0; raf = requestAnimationFrame(frame); } }
+      function stop(){
+        if (raf) cancelAnimationFrame(raf);
+        raf = null; last = 0; target = current = window.scrollY;
+      }
+      function sync(){ if (!raf){ target = current = window.scrollY; } }
+
+      // Let inner scrollable boxes (menus, modals) scroll themselves.
+      function innerScroller(el, dy){
+        for (; el && el !== document.body && el !== root; el = el.parentElement){
+          if (el.nodeType !== 1) continue;
+          const oy = getComputedStyle(el).overflowY;
+          if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1){
+            if (dy < 0 ? el.scrollTop > 0 : el.scrollTop + el.clientHeight < el.scrollHeight - 1) return true;
+          }
+        }
+        return false;
+      }
+
+      window.addEventListener('wheel', (e) => {
+        if (e.defaultPrevented || e.ctrlKey) return;
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;   // horizontal carousels
+        if (getComputedStyle(document.body).overflow === 'hidden' ||
+            getComputedStyle(root).overflow === 'hidden') return;
+        if (innerScroller(e.target, e.deltaY)) return;
+        let dy = e.deltaY;
+        if (e.deltaMode === 1) dy *= 40; else if (e.deltaMode === 2) dy *= window.innerHeight;
+        e.preventDefault();
+        if (!raf) current = target = window.scrollY;
+        target = clampY(target + dy * SPEED);
+        start();
+      }, { passive:false });
+
+      window.addEventListener('scroll', sync, { passive:true });
+      window.addEventListener('resize', () => { target = clampY(target); }, { passive:true });
+
+      // In-page links (#reel, #blog …) glide too.
+      document.addEventListener('click', (e) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        const a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a) return;
+        const hash = a.getAttribute('href');
+        if (!hash || hash.length < 2) return;
+        let el = null; try { el = document.querySelector(hash); } catch(_) {}
+        if (!el) return;
+        e.preventDefault();
+        current = window.scrollY;
+        target = clampY(el.getBoundingClientRect().top + window.scrollY);
+        start();
+        try { history.pushState(null, '', hash); } catch(_) {}
+      });
+
+      window.__glide = {
+        stop,
+        scrollTo(y){ current = window.scrollY; target = clampY(y); start(); }
+      };
+    })();
+
+    // Dock the landing buttons: when they scroll up to the frame line they move to a
+    // fixed bar (Home left, menu right); scrolling back up returns them under the name.
+    (function dockNav(){
+      const header = document.getElementById('siteHeader');
+      if (!header || !header.parentElement) return;
+      const ph = document.createElement('div');
+      ph.className = 'nav-slot';
+      header.parentElement.insertBefore(ph, header);
+      let docked = false, raf = null;
+      const dockTop = () => window.innerWidth <= 700
+        ? 12
+        : Math.min(26, Math.max(14, window.innerWidth * 0.016)) + 16;
+      function check(){
+        raf = null;
+        const ref = docked ? ph : header;
+        const top = ref.getBoundingClientRect().top + (docked ? parseFloat(ph.dataset.mt || 0) : 0);
+        const should = top <= dockTop();
+        if (should && !docked){
+          const mt = parseFloat(getComputedStyle(header).marginTop) || 0;
+          ph.dataset.mt = mt;
+          ph.style.height = (header.offsetHeight + mt) + 'px';
+          if (typeof closeMenu === 'function') closeMenu();
+          document.body.appendChild(header);
+          header.classList.add('is-docked');
+          docked = true;
+        } else if (!should && docked){
+          if (typeof closeMenu === 'function') closeMenu();
+          header.classList.remove('is-docked');
+          ph.parentElement.insertBefore(header, ph.nextSibling);
+          ph.style.height = '0px';
+          docked = false;
+        }
+      }
+      // Menu button, Stories ⇄ Thoughts: it melts into a thin straight line, runs
+      // along the edge where the two sections meet, turns down (or up) to its new
+      // spot and swells back into the button.
+      let ghost = null;
+      function menuTravel(btn, r0, r1, edgeY){
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (ghost){ ghost.anim.cancel(); }
+        const g = document.createElement('div');
+        g.setAttribute('aria-hidden', 'true');
+        g.style.cssText = 'position:fixed;left:0;top:0;z-index:60;pointer-events:none;' +
+          'transform:translate(-50%,-50%);';
+        // Only on the way down into Thoughts; the real button simply melts back in
+        // beside Home (same as Home does).
+        if (r1.left + r1.width / 2 >= r0.left + r0.width / 2){ g.remove(); return; }
+        document.body.appendChild(g);
+
+        const cx = r0.left + r0.width / 2, cy = r0.top + r0.height / 2;
+        const S = r0.width;
+        const y = Math.max(0.5, edgeY - 0.5);                 // the very last pixel of Stories
+        const f = (x, top, w, h, r, bg, sh, o, op) => ({
+          left:x + 'px', top:top + 'px', width:w + 'px', height:h + 'px', borderRadius:r + 'px',
+          background:bg, boxShadow:sh, opacity:op, offset:o });
+        const outline = 'inset 0 0 0 1px rgba(255,255,255,.14)', none = 'inset 0 0 0 0 rgba(255,255,255,0)';
+        const white = 'rgba(255,255,255,.85)';
+        const anim = g.animate([
+          f(cx, cy, S, S, 14, 'rgba(255,255,255,.012)', outline, 0, 1),
+          f(cx, y,  S, 1, 0, white, none, .22, 1),             // flatten into a white line on the edge
+          f(cx * .45, y, S * 1.2, 1, 0, white, none, .7, .7),   // slide left along it
+          f(0,  y,  S * .6, 1, 0, white, none, 1, 0)            // dissolve into the dark
+        ], { duration: 1000, easing: 'cubic-bezier(.4,0,.3,1)', fill: 'forwards' });
+        ghost = { anim };
+        const done = () => { g.remove(); if (ghost && ghost.anim === anim) ghost = null; };
+        anim.onfinish = done;
+        anim.oncancel = done;
+      }
+
+      const reel = document.getElementById('reel');
+      function checkStories(){
+        if (!reel) return;
+        const r = reel.getBoundingClientRect();
+        const line = dockTop() + 23;                       // middle of the buttons
+        const blog = document.getElementById('blog');
+        if (blog){
+          const b = blog.getBoundingClientRect();
+          // Phones: switch as soon as Stories has ended and the middle of Thoughts
+          // (where the buttons go) is fully on screen. Big screens: at the top line.
+          // Phones: switch the moment Thoughts reaches the buttons at the bottom of
+          // Stories. Big screens: at the top line.
+          const side = window.innerWidth <= 700
+            ? b.top <= window.innerHeight - 28 - 46
+            : b.top <= line;
+          // Ride along at the vertical middle of the Thoughts section; once that
+          // middle scrolls up to the top-left corner, stay pinned there.
+          const nav = header.querySelector('.nav');
+          const half = (nav ? nav.offsetHeight : 100) / 2;
+          const setTop = () => {
+            // ride with the middle of Thoughts; never above the top line, and on
+            // phones never below the bottom edge of the screen
+            let y = Math.max(b.top + b.height / 2, dockTop() + half);
+            // Phones: top-left / top-right corners of Thoughts, riding with the
+            // section's top edge, then pinned to the top of the screen.
+            if (window.innerWidth <= 700) y = Math.max(b.top + 12 + half, dockTop() + half);
+            if (side) header.style.top = y + 'px';
+            else header.style.top = '';
+          };
+          if (side !== header.classList.contains('side')){
+            if (typeof closeMenu === 'function') closeMenu();
+            const dots = document.getElementById('hamburger');
+            const docked = header.classList.contains('is-docked');
+            const r0 = dots && docked ? dots.getBoundingClientRect() : null;
+            const phone = window.innerWidth <= 700;
+            // Phones: Stories ⇄ Thoughts is a slow glide — Home to the left edge,
+            // menu to the right edge (and back), no melt.
+            const btns = phone && docked ? [header.querySelector('.nav-home'), dots].filter(Boolean) : [];
+            const before = btns.map(el => el.getBoundingClientRect());
+            header.classList.toggle('side', side);
+            if (phone){
+              const sOn = r.top <= line && r.bottom > line;
+              header.classList.toggle('on-stories', !side && sOn);
+            }
+            setTop();
+            if (btns.length){
+              btns.forEach((el, i) => {
+                const a = before[i], b2 = el.getBoundingClientRect();
+                const dx = a.left - b2.left, dy = a.top - b2.top;
+                if (Math.abs(dx) + Math.abs(dy) < 1) return;
+                el.animate([{ transform:`translate(${dx}px, ${dy}px)` }, { transform:'translate(0,0)' }],
+                  { duration: 1200, easing: 'cubic-bezier(.22,1,.36,1)' });
+              });
+            } else if (docked){
+              header.classList.remove('melt'); void header.offsetWidth; header.classList.add('melt');
+              clearTimeout(checkStories.t);
+              checkStories.t = setTimeout(() => header.classList.remove('melt'), 950);
+            }
+          } else {
+            setTop();
+          }
+          // Grey ink whenever the buttons actually sit over the white Thoughts page
+          if (nav && header.classList.contains('is-docked')){
+            const nr = nav.getBoundingClientRect();
+            const mid = nr.top + nr.height / 2;
+            header.classList.toggle('on-light', b.top <= mid && b.bottom > mid);
+          } else {
+            header.classList.remove('on-light');
+          }
+        }
+        const was = header.classList.contains('on-stories'), m = was ? 40 : 0;
+        const on = r.top <= line + m && r.bottom > line - m &&
+          !(window.innerWidth <= 700 && header.classList.contains('side'));
+        if (on !== header.classList.contains('on-stories')){
+          const docked = header.classList.contains('is-docked');
+          // Phones, photos → Stories: the buttons drop like a bead of liquid glass —
+          // fall, squash on landing, a small jelly bounce, settle (≈0.48s).
+          const drop = false && on && docked && window.innerWidth <= 700 &&   // drop retired: melt on all sizes
+            !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const btns = drop ? [header.querySelector('.nav-home'), document.getElementById('hamburger')].filter(Boolean) : [];
+          const before = btns.map(el => el.getBoundingClientRect());
+          header.classList.toggle('on-stories', on);
+          if (btns.length){
+            if (typeof closeMenu === 'function') closeMenu();
+            header.classList.add('dropping');
+            header.classList.remove('melt');
+            btns.forEach((el, i) => {
+              const a = before[i], b2 = el.getBoundingClientRect();
+              const dx = a.left - b2.left, dy = a.top - b2.top;
+              // 1) fall straight down at its own side, 2) land with a jelly squash and
+              // a small bounce, 3) glide in to meet the other button in the middle.
+              el.animate([
+                { transform:`translate(${dx}px, ${dy}px) scale(1,1)`, offset:0, easing:'cubic-bezier(.45,0,.8,.35)' },
+                { transform:`translate(${dx}px, 0px) scale(.95,1.07)`, offset:.4, easing:'cubic-bezier(.25,.6,.35,1)' },
+                { transform:`translate(${dx}px, 2px) scale(1.16,.84)`, offset:.48, easing:'cubic-bezier(.3,.6,.4,1)' },
+                { transform:`translate(${dx}px, -7px) scale(.96,1.05)`, offset:.58, easing:'cubic-bezier(.45,0,.55,1)' },
+                { transform:`translate(${dx}px, 0px) scale(1.02,.98)`, offset:.66, easing:'cubic-bezier(.65,0,.35,1)' },
+                { transform:'translate(0px, 0px) scale(1.05,.96)', offset:.9, easing:'cubic-bezier(.3,.6,.4,1)' },
+                { transform:'translate(0px, 0px) scale(1,1)', offset:1 }
+              ], { duration: 1000 }).onfinish = () => header.classList.remove('dropping');
+              el.style.transformOrigin = '50% 100%';
+            });
+          } else if (docked){
+            header.classList.remove('melt');
+            void header.offsetWidth;                        // restart the animation
+            header.classList.add('melt');
+            clearTimeout(checkStories.t);
+            checkStories.t = setTimeout(() => header.classList.remove('melt'), 950);
+          }
+        }
+      }
+      const _check = check;
+      check = function(){ _check(); checkStories(); };
+      const schedule = () => { if (!raf) raf = requestAnimationFrame(check); };
+      window.addEventListener('scroll', schedule, { passive:true });
+      window.addEventListener('resize', schedule, { passive:true });
+      check();
+    })();
+
+    // Stories cards: each album flips to its next photo every second (only while
+    // the Stories section is on screen).
+    (function storyAlbums(){
+      const albums = {
+        'stories/sunsets.html':   ['sunsets/sunset1','sunsets/sunset2','sunsets/sunset3','sunsets/sunset4','sunsets/sunset5','sunsets/sunset6','sunsets/sunset7','sunsets/sunset8','sunsets/sunset9','sunsets/sunset10'],
+        'stories/cars.html':      ['cars/car1','cars/car4','cars/car5','cars/car6','cars/car7'],
+        'stories/concretes.html': ['concretes/concrete1','concretes/concrete2'],
+        'stories/nature.html':    ['nature/nature1','nature/nature2','nature/nature3','nature/nature4','nature/nature6','nature/nature7','nature/nature10'],
+      };
+      const section = document.getElementById('reel');
+      if (!section) return;
+      const decks = [];
+      section.querySelectorAll('.st-card').forEach(card => {
+        const list = albums[card.getAttribute('href')];
+        const media = card.querySelector('.st-media');
+        if (!list || !media) return;
+        const urls = list.map(p => 'assets/' + p + '.jpg');
+        const a = document.createElement('i'), b = document.createElement('i');
+        a.style.backgroundImage = `url('${urls[0]}')`; a.className = 'on';
+        media.style.backgroundImage = 'none';
+        media.append(a, b);
+        decks.push({ urls, layers:[a, b], idx:0, front:0 });
+      });
+      const loaded = new Set();
+      const preload = (u) => { if (loaded.has(u)) return; loaded.add(u); const im = new Image(); im.decoding = 'async'; im.src = u; };
+      // Every 2s: a 0.7s focus-pull cross-fade. The next photo is decoded first so
+      // it never pops in half-drawn.
+      function step(){
+        decks.forEach(d => {
+          if (d.urls.length < 2 || d.busy) return;
+          d.busy = true;
+          const nextIdx = (d.idx + 1) % d.urls.length, url = d.urls[nextIdx];
+          const front = d.layers[d.front], back = d.layers[1 - d.front];
+          const img = new Image(); img.src = url;
+          const ready = img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+          ready.then(() => {
+            back.style.zIndex = '2'; front.style.zIndex = '1';
+            back.style.backgroundImage = `url('${url}')`;
+            requestAnimationFrame(() => {
+              back.classList.add('on');
+              front.classList.remove('on');
+            });
+            d.idx = nextIdx; d.front = 1 - d.front; d.busy = false;
+            preload(d.urls[(nextIdx + 1) % d.urls.length]);
+          });
+        });
+      }
+      let timer = null;
+      const start = () => {
+        if (timer) return;
+        decks.forEach(d => d.urls.slice(0, 3).forEach(preload));
+        timer = setInterval(step, 2000);
+      };
+      const stop = () => { clearInterval(timer); timer = null; };
+      if ('IntersectionObserver' in window){
+        new IntersectionObserver(es => es.forEach(e => e.isIntersecting ? start() : stop()),
+          { rootMargin: '200px 0px' }).observe(section);
+      } else start();
+    })();
+
+    // Stories: vertical 3D stack. Wheel over the RIGHT half flips stories;
+    // over the LEFT half the page scrolls normally. At the first/last story the
+    // wheel falls through to the page so you can scroll past the section.
+    (function storiesStack(){
+      // Smooth stack: a continuous position eased by a soft spring (slightly
+      // under-damped, so each move settles with a gentle pull back), finger-
+      // following drags with rubber-band resistance at the ends.
+      const section = document.getElementById('reel');
+      const stage = document.getElementById('storiesStage');
+      if (!section || !stage) return;
+      const cards = Array.from(stage.querySelectorAll('.st-card'));
+      const dots = Array.from(section.querySelectorAll('.st-dot'));
+      const last = cards.length - 1;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let target = 0, pos = 0, vel = 0, active = 0, raf = null, last_t = 0;
+      let dragging = false, lock = false, acc = 0, lockTimer = null;
+      // tuned to the reference: arrives in ~0.17s, overshoots ~8%, eases back in ~0.3s
+      // buttery: soft, heavy spring that glides and settles with just a hint of bounce
+      const K = 105, C = 2 * Math.sqrt(K) * 0.76;            // spring stiffness / damping
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+      const rubber = (x) => x * 0.35 / (1 + Math.abs(x) * 0.9); // resistance past the ends
+
+      cards.forEach(c => { c.style.transition = 'none'; });
+
+      // Film reel seen from the inside: the cards sit on the inner wall of a drum
+      // and the camera is fixed at the drum's centre, looking at the middle card.
+      // Scrolling turns the drum, so the reel runs up and down past your eye.
+      function paint(){
+        const h = cards[0] ? cards[0].offsetHeight : 400;
+        const R = h * 1.6;                                  // drum radius
+        const step = (h * 1.1) / R;                         // angle between frames (rad)
+        stage.style.perspective = R + 'px';
+        stage.style.perspectiveOrigin = '50% 50%';
+        cards.forEach((c, i) => {
+          const d = i - pos, th = d * step, a = Math.abs(th);
+          const deg = (th * 180 / Math.PI).toFixed(3);
+          c.style.transform = `translateZ(${R}px) rotateX(${deg}deg) translateZ(${-R}px)`;
+          const vis = a < 1.15;
+          c.style.opacity = vis ? Math.min(1, (1.15 - a) / 0.35).toFixed(3) : '0';
+          c.style.zIndex = String(20 - Math.round(Math.abs(d) * 4));
+          c.style.pointerEvents = Math.abs(d) < 0.5 ? 'auto' : 'none';
+          c.style.filter = `brightness(${(1 - Math.min(1, a) * 0.6).toFixed(3)})`;
+          c.style.setProperty('--c', '1');
+          c.style.background = 'var(--tint)';
+          c.style.boxShadow = '';
+          c.style.backfaceVisibility = 'hidden';
+        });
+        const n = clamp(Math.round(pos), 0, last);
+        if (n !== active){ active = n; labels(); }
+      }
+      function labels(){
+        cards.forEach((c, i) => {
+          const d = i - active;
+          c.dataset.pos = Math.abs(d) > 2 ? (d < 0 ? '-far' : 'far') : String(d);
+          c.setAttribute('aria-hidden', d === 0 ? 'false' : 'true');
+          c.tabIndex = d === 0 ? 0 : -1;
+        });
+        dots.forEach((b, i) => {
+          b.classList.toggle('active', i === active);
+          b.setAttribute('aria-current', i === active ? 'true' : 'false');
+        });
+      }
+      function frame(t){
+        const dt = Math.min(0.033, last_t ? (t - last_t) / 1000 : 0.016); last_t = t;
+        if (!dragging){
+          const a = K * (target - pos) - C * vel;
+          vel += a * dt; pos += vel * dt;
+          if (Math.abs(target - pos) < 0.0008 && Math.abs(vel) < 0.002){ pos = target; vel = 0; }
+        }
+        paint();
+        if (dragging || pos !== target) raf = requestAnimationFrame(frame);
+        else { raf = null; last_t = 0; }
+      }
+      const kick = () => { if (!raf){ last_t = 0; raf = requestAnimationFrame(frame); } };
+      function go(i){
+        const n = clamp(i, 0, last);
+        if (reduce){ target = pos = n; vel = 0; paint(); return; }
+        target = n; kick();
+      }
+      // keep the API used elsewhere
+      const onRightHalf = (x) => window.innerWidth <= 800 || x >= window.innerWidth / 2;
+      const inView = () => Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.35;
+      const atEdge = (dir) => (dir < 0 && target === 0) || (dir > 0 && target === last);
+
+      // Wheel = continuous scrub: the stack turns with the scroll itself (like a
+      // picker wheel), then settles on the nearest card shortly after you stop.
+      let settleTimer = null;
+      section.addEventListener('wheel', (e) => {
+        if (!onRightHalf(e.clientX) || !inView()) return;
+        let dy = e.deltaY;
+        if (e.deltaMode === 1) dy *= 40; else if (e.deltaMode === 2) dy *= window.innerHeight;
+        const dir = Math.sign(dy);
+        if (!dir) return;
+        const atStart = target <= 0.001 && pos <= 0.02, atEnd = target >= last - 0.001 && pos >= last - 0.02;
+        if ((dir < 0 && atStart) || (dir > 0 && atEnd)) return;   // let the page continue
+        e.preventDefault();
+        const top = section.getBoundingClientRect().top;
+        if (Math.abs(top) > 2){
+          if (window.__glide) window.__glide.scrollTo(window.scrollY + top);
+          else window.scrollTo({ top: window.scrollY + top, behavior: 'smooth' });
+        }
+        const h = (cards[0] ? cards[0].offsetHeight : 400) * 1.05;
+        target = clamp(target + dy / h, 0, last);
+        kick();
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(() => { target = Math.round(target); kick(); }, 160);
+      }, { passive:false });
+
+      // Touch: the stack follows your finger, then springs to the nearest card
+      let ty0 = null, pos0 = 0, lastY = 0, lastT = 0, vy = 0, claimed = false;
+      stage.addEventListener('touchstart', (e) => {
+        ty0 = lastY = e.touches[0].clientY; lastT = performance.now(); vy = 0;
+        pos0 = pos; claimed = false;
+      }, { passive:true });
+      stage.addEventListener('touchmove', (e) => {
+        if (ty0 === null) return;
+        const y = e.touches[0].clientY, dy = ty0 - y;
+        const dir = Math.sign(dy);
+        if (!claimed){
+          if (Math.abs(dy) < 6) return;
+          if (atEdge(dir)) { ty0 = null; return; }            // past the end: page scrolls
+          claimed = true; dragging = true; vel = 0; kick();
+        }
+        e.preventDefault();
+        const now = performance.now();
+        vy = (lastY - y) / Math.max(1, now - lastT); lastY = y; lastT = now;
+        const h = (cards[0] ? cards[0].offsetHeight : 400) * 0.9;
+        let p = pos0 + dy / h;
+        if (p < 0) p = -rubber(-p); else if (p > last) p = last + rubber(p - last);
+        pos = p;
+      }, { passive:false });
+      const endTouch = () => {
+        if (ty0 === null) return;
+        ty0 = null;
+        if (!claimed) return;
+        dragging = false;
+        const h = (cards[0] ? cards[0].offsetHeight : 400) * 0.9;
+        vel = vy * 1000 / h;                                 // carry the flick
+        const proj = pos + vel * 0.18;
+        target = clamp(Math.round(proj), 0, last);
+        kick();
+      };
+      stage.addEventListener('touchend', endTouch);
+      stage.addEventListener('touchcancel', endTouch);
+
+      stage.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight'){ e.preventDefault(); go(target + 1); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ e.preventDefault(); go(target - 1); }
+      });
+      cards.forEach((c, i) => c.addEventListener('click', (e) => {
+        if (i !== active){ e.preventDefault(); go(i); }
+      }));
+      dots.forEach((b, i) => b.addEventListener('click', () => go(i)));
+      window.addEventListener('resize', paint, { passive:true });
+
+      labels(); paint();
+    })();
 
     // Init
     snapBlogToNearest(true);

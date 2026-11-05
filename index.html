@@ -591,7 +591,7 @@
       #siteHeader.is-docked.on-stories .mobile-menu.open{ clip-path: inset(0 0 0 0 round 14px); }
     }
     /* stack contents fade continuously with distance from the centre */
-    #storiesStage .st-card > *{ opacity: var(--c, 1) !important; }
+    #storiesStage .st-card > :not(.st-shade){ opacity: var(--c, 1) !important; }
     /* black wash at the end of the photos (all screen sizes) */
     .gal-fade-out{
       position:absolute; inset:0;
@@ -923,6 +923,11 @@
     /* Stories cards — the Thoughts card language on dark: one quiet graphite
        surface for every story, a hairline edge, soft grey type and a huge faint
        number in the corner. */
+    #storiesStage .st-card .st-shade{
+      position:absolute; inset:0; border-radius:inherit;
+      background:#000; opacity:0; pointer-events:none;
+      will-change: opacity; z-index:5;
+    }
     #storiesStage .st-card{
       --tint: #EFEFF0;
       color:#666666;
@@ -995,7 +1000,7 @@
     .st-card[data-pos="-2"], .st-card[data-pos="-far"]{ transform: translateY(calc(var(--card-h) * -1)) rotateX(80deg) scale(.85); opacity:0; pointer-events:none; }
     .st-card[data-pos="2"], .st-card[data-pos="far"]{ transform: translateY(calc(var(--card-h) * 1)) rotateX(-80deg) scale(.85); opacity:0; pointer-events:none; }
     .st-card:not([data-pos="0"]){ background: rgba(255,255,255,.07); cursor:pointer; }
-    .st-card:not([data-pos="0"]) > *{ opacity:0; }
+    .st-card:not([data-pos="0"]) > :not(.st-shade){ opacity:0; }
 
     .st-dots{
       position:absolute; right: clamp(12px, 4vw, 90px); top:50%;
@@ -3226,7 +3231,7 @@
       const root = document.documentElement;
       root.style.scrollBehavior = 'auto';      // per-frame scrollTo must be instant
 
-      const EASE = 0.065;   // lower = slower, silkier glide
+      const EASE = 0.09;    // lower = slower, silkier glide
       const SPEED = 1;      // distance per wheel notch multiplier
 
       let target = window.scrollY, current = window.scrollY, raf = null, last = 0;
@@ -3263,11 +3268,25 @@
         return false;
       }
 
+      // Trackpads (and Magic Mouse) already scroll with smooth native momentum;
+      // easing them again adds lag. Only notched mouse wheels get the glide.
+      let lastPad = 0;
+      const isWheel = (e) => {
+        if (e.deltaMode !== 0) return true;                       // line / page steps
+        if (e.deltaX !== 0) return false;                         // any sideways = trackpad
+        const w = e.wheelDeltaY;
+        if (typeof w === 'number' && w !== 0) return Math.abs(w) % 120 === 0 && Math.abs(e.deltaY) >= 40;
+        return Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 50;
+      };
       window.addEventListener('wheel', (e) => {
         if (e.defaultPrevented || e.ctrlKey) return;
+        const now = performance.now();
+        // once a trackpad gesture is seen, keep treating the stream as trackpad
+        if (!isWheel(e) || now - lastPad < 200){ lastPad = now; if (raf) stop(); return; }
         if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;   // horizontal carousels
-        if (getComputedStyle(document.body).overflow === 'hidden' ||
-            getComputedStyle(root).overflow === 'hidden') return;
+        if (!raf && (document.body.style.overflow === 'hidden' ||
+            getComputedStyle(document.body).overflow === 'hidden' ||
+            getComputedStyle(root).overflow === 'hidden')) return;
         if (innerScroller(e.target, e.deltaY)) return;
         let dy = e.deltaY;
         if (e.deltaMode === 1) dy *= 40; else if (e.deltaMode === 2) dy *= window.innerHeight;
@@ -3282,6 +3301,7 @@
 
       window.__glide = {
         stop,
+        busy: () => !!raf,
         scrollTo(y){ current = window.scrollY; target = clampY(y); start(); }
       };
     })();
@@ -3602,13 +3622,22 @@
       const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
       const rubber = (x) => x * 0.35 / (1 + Math.abs(x) * 0.9); // resistance past the ends
 
-      cards.forEach(c => { c.style.transition = 'none'; });
+      cards.forEach(c => { c.style.transition = 'none'; c.style.filter = ''; });
+      // a dark shade over each card does the dimming (opacity is GPU-cheap;
+      // animating a filter would repaint the photo every frame)
+      const shades = cards.map(c => {
+        const sh = document.createElement('span');
+        sh.className = 'st-shade'; sh.setAttribute('aria-hidden', 'true');
+        c.appendChild(sh); return sh;
+      });
 
       // Film reel seen from the inside: the cards sit on the inner wall of a drum
       // and the camera is fixed at the drum's centre, looking at the middle card.
       // Scrolling turns the drum, so the reel runs up and down past your eye.
+      let cardH = 0;
       function paint(){
-        const h = cards[0] ? cards[0].offsetHeight : 400;
+        if (!cardH) cardH = cards[0] ? cards[0].offsetHeight : 400;
+        const h = cardH;
         const R = h * 1.6;                                  // drum radius
         const step = (h * 1.1) / R;                         // angle between frames (rad)
         stage.style.perspective = R + 'px';
@@ -3621,7 +3650,7 @@
           c.style.opacity = vis ? Math.min(1, (1.15 - a) / 0.35).toFixed(3) : '0';
           c.style.zIndex = String(20 - Math.round(Math.abs(d) * 4));
           c.style.pointerEvents = Math.abs(d) < 0.5 ? 'auto' : 'none';
-          c.style.filter = `brightness(${(1 - Math.min(1, a) * 0.72).toFixed(3)})`;
+          shades[i].style.opacity = (Math.min(1, a) * 0.72).toFixed(3);
           c.style.setProperty('--c', '1');
           c.style.background = 'var(--tint)';
           c.style.boxShadow = '';
@@ -3650,10 +3679,14 @@
       const startY = () => section.getBoundingClientRect().top + window.scrollY;
       const cardY = (i) => startY() + clamp(i, 0, last) * stepPx();
       let scrollRaf = null, idle = null, touching = false;
-      function fromScroll(){
+      let lastP = -1;
+      function fromScroll(force){
         scrollRaf = null;
-        const run = section.offsetHeight - window.innerHeight;
-        const p = run > 0 ? clamp(-section.getBoundingClientRect().top / run, 0, 1) : 0;
+        const r = section.getBoundingClientRect();
+        const run = r.height - window.innerHeight;
+        const p = run > 0 ? clamp(-r.top / run, 0, 1) : 0;
+        if (force !== true && Math.abs(p - lastP) < 0.0002) return;   // off screen / unchanged: nothing to do
+        lastP = p;
         pos = p * last; target = pos;
         paint();
       }
@@ -3663,7 +3696,7 @@
       }
       // when scrolling stops part-way between two cards, ease onto the nearest one
       function settle(){
-        if (touching || window.__anchoring) return;
+        if (touching || window.__anchoring || (window.__glide && window.__glide.busy())) { clearTimeout(idle); idle = setTimeout(settle, 120); return; }
         if (pos <= 0.001 || pos >= last - 0.001) return;
         const n = Math.round(pos);
         if (Math.abs(pos - n) < 0.01) return;
@@ -3672,11 +3705,11 @@
       window.addEventListener('scroll', () => {
         if (!scrollRaf) scrollRaf = requestAnimationFrame(fromScroll);
         clearTimeout(idle);
-        idle = setTimeout(settle, 140);
+        idle = setTimeout(settle, 180);
       }, { passive:true });
       window.addEventListener('touchstart', () => { touching = true; clearTimeout(idle); }, { passive:true });
       window.addEventListener('touchend', () => { touching = false; clearTimeout(idle); idle = setTimeout(settle, 220); }, { passive:true });
-      window.addEventListener('resize', fromScroll, { passive:true });
+      window.addEventListener('resize', () => { cardH = 0; fromScroll(true); }, { passive:true });
 
       const go = (i) => glideTo(cardY(i));
       stage.addEventListener('keydown', (e) => {
@@ -3688,7 +3721,7 @@
       }));
       dots.forEach((b, i) => b.addEventListener('click', () => go(i)));
 
-      fromScroll();
+      fromScroll(true);
       labels();
     })();
 

@@ -604,26 +604,18 @@
       will-change: opacity;
     }
     @media (max-width: 899px){ .gal-fade-out{ display:block; } }
-    /* Phones, Stories only: Home + menu as thick, very frosted glass tiles */
+    /* Phones, Stories only: quiet frosted tiles (soft blur, no shine) */
     @media (max-width: 700px){
       #siteHeader.is-docked.on-stories .nav-home,
       #siteHeader.is-docked.on-stories .hamburger.nav-more{
         border:none !important;
-        background:
-          radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.10) 0%, rgba(255,255,255,0) 60%),
-          linear-gradient(180deg, rgba(255,255,255,.13) 0%, rgba(255,255,255,.08) 45%, rgba(255,255,255,.05) 100%) !important;
-        backdrop-filter: blur(88px) saturate(1.35) brightness(1.05) !important;
-        -webkit-backdrop-filter: blur(88px) saturate(1.35) brightness(1.05) !important;
+        background: rgba(255,255,255,.05) !important;
+        backdrop-filter: blur(24px) saturate(1.1) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(1.1) !important;
         box-shadow:
-          inset 0 1px 0 rgba(255,255,255,.28),        /* softer lit top edge */
-          inset 0 3px 6px rgba(255,255,255,.06),      /* light pooling inside the slab */
-          inset 0 -4px 7px rgba(0,0,0,.32),           /* deep shaded underside = thickness */
-          inset 0 -1px 0 rgba(255,255,255,.07),       /* light caught on the bottom bevel */
-          inset 0 0 0 1.5px rgba(255,255,255,.12),    /* thicker glass rim */
-          inset 0 0 16px rgba(255,255,255,.05),
-          0 10px 24px rgba(0,0,0,.34),
-          0 2px 5px rgba(0,0,0,.22) !important;
-        color: rgba(245,246,247,.85) !important;
+          inset 0 0 0 1px rgba(255,255,255,.07),
+          0 4px 14px rgba(0,0,0,.16) !important;
+        color: rgba(245,246,247,.7) !important;
       }
     }
     /* the last photo section never paints past its own bottom edge */
@@ -868,7 +860,17 @@
     }
 
     /* STORIES — left label, right 3D vertical stack (wheel on the right half flips stories) */
-    .panel.stories{padding:0; height:100vh; min-height:100vh; overflow:hidden}
+    /* Stories is scroll-driven: the section is taller than the screen and its stage
+       stays pinned while page scroll turns the reel (one --st-step of scroll per card) */
+    .panel.stories{
+      --st-step: 65vh;
+      padding:0; display:block;
+      height: calc(100vh + 3 * var(--st-step)); min-height:0;
+      overflow:visible;
+      background:#000305;
+    }
+    @media (max-width: 700px){ .panel.stories{ --st-step: 55vh; } }
+    .stories-pin{ position:sticky; top:0; height:100vh; overflow:hidden; }
     .panel.stories::before{display:none}
     .stories-left{
       position:absolute; left:0; top:0; bottom:0; width:50%;
@@ -918,6 +920,60 @@
       box-shadow: 0 22px 40px rgba(20,32,43,.22);
     }
     .st-label{ font-size: 20px; font-weight: 500; letter-spacing: -.005em; }
+    /* Stories cards — the Thoughts card language on dark: one quiet graphite
+       surface for every story, a hairline edge, soft grey type and a huge faint
+       number in the corner. */
+    #storiesStage .st-card{
+      --tint: #EFEFF0;
+      color:#666666;
+      border-radius:14px;
+      padding: clamp(14px, 1.5vw, 20px);
+      box-shadow: 0 30px 60px -20px rgba(0,0,0,.6);
+      overflow:hidden;
+    }
+    #storiesStage .st-media{
+      flex:1 1 auto; min-height:0;
+      aspect-ratio:auto;
+      margin:0;
+      border-radius:8px;
+      box-shadow:none;
+    }
+    #storiesStage .st-foot{
+      flex:none;
+      display:flex; align-items:flex-end; justify-content:space-between;
+      gap:12px;
+      padding: clamp(14px, 1.6vw, 22px) 4px 0;
+    }
+    #storiesStage .st-text{ display:flex; flex-direction:column; gap:6px; padding-bottom:4px; }
+    #storiesStage .st-label{
+      font-size: clamp(18px, 1.6vw, 24px);
+      font-weight:450;
+      line-height:1.1;
+      letter-spacing:-.01em;
+      color:#666666;
+    }
+    #storiesStage .st-meta{
+      font-size:12px;
+      letter-spacing:.04em;
+      color:#959595;
+    }
+    #storiesStage .st-num{
+      font-size: clamp(56px, 6vw, 96px);
+      font-weight:200;
+      line-height:.78;
+      letter-spacing:-.06em;
+      background: linear-gradient(180deg, #DCDCDE 0%, #E3E3E4 55%, #EBEBEC 100%);
+      -webkit-background-clip:text; background-clip:text;
+      color:transparent; -webkit-text-fill-color:transparent;
+      user-select:none;
+    }
+    @media (max-width: 800px){
+      #storiesStage .st-card{ padding:12px; border-radius:14px; }
+      #storiesStage .st-foot{ padding:14px 4px 0; }
+      #storiesStage .st-label{ font-size:17px; }
+      #storiesStage .st-meta{ font-size:11px; }
+      #storiesStage .st-num{ font-size:56px; }
+    }
     /* album slideshow inside each Stories card: two stacked layers cross-fade */
     .st-media{ position:relative; overflow:hidden; }
     .st-media > i{
@@ -2192,6 +2248,7 @@
 
 <!-- WORK (carousel: 4 items) -->
     <section class="panel stories" id="reel" aria-label="Stories">
+      <div class="stories-pin">
       <div class="bg" style="background:#000305"></div>
 
       <div class="stories-left">
@@ -2199,21 +2256,45 @@
       </div>
 
       <div class="stories-right" id="storiesStage" tabindex="0" aria-roledescription="carousel" aria-label="Stories — scroll here to browse">
-        <a class="st-card" style="--tint:#F8E6C2" href="stories/sunsets.html">
+        <a class="st-card" href="stories/sunsets.html">
           <div class="st-media" style="background-image:url('assets/work.jpg')"></div>
-          <span class="st-label">Sunsets</span>
+          <div class="st-foot">
+            <div class="st-text">
+              <span class="st-label">Sunsets</span>
+              <span class="st-meta">10 stills</span>
+            </div>
+            <span class="st-num" aria-hidden="true">01</span>
+          </div>
         </a>
-        <a class="st-card" style="--tint:#DCE4EE" href="stories/cars.html">
+        <a class="st-card" href="stories/cars.html">
           <div class="st-media" style="background-image:url('assets/work3.jpg')"></div>
-          <span class="st-label">Cars</span>
+          <div class="st-foot">
+            <div class="st-text">
+              <span class="st-label">Cars</span>
+              <span class="st-meta">5 stills</span>
+            </div>
+            <span class="st-num" aria-hidden="true">02</span>
+          </div>
         </a>
-        <a class="st-card" style="--tint:#E8E4DE" href="stories/concretes.html">
+        <a class="st-card" href="stories/concretes.html">
           <div class="st-media" style="background-image:url('assets/work4.jpg')"></div>
-          <span class="st-label">Concretes</span>
+          <div class="st-foot">
+            <div class="st-text">
+              <span class="st-label">Concretes</span>
+              <span class="st-meta">2 stills</span>
+            </div>
+            <span class="st-num" aria-hidden="true">03</span>
+          </div>
         </a>
-        <a class="st-card" style="--tint:#DCE8D4" href="stories/nature.html">
+        <a class="st-card" href="stories/nature.html">
           <div class="st-media" style="background-image:url('assets/work2.jpg')"></div>
-          <span class="st-label">Nature</span>
+          <div class="st-foot">
+            <div class="st-text">
+              <span class="st-label">Nature</span>
+              <span class="st-meta">7 stills</span>
+            </div>
+            <span class="st-num" aria-hidden="true">04</span>
+          </div>
         </a>
       </div>
 
@@ -2223,6 +2304,7 @@
         <button class="st-dot" type="button" aria-label="Concretes"></button>
         <button class="st-dot" type="button" aria-label="Nature"></button>
       </div>
+      </div><!-- /stories-pin -->
     </section>
         
     
@@ -3286,7 +3368,7 @@
           // Phones: switch the moment Thoughts reaches the buttons at the bottom of
           // Stories. Big screens: at the top line.
           const side = window.innerWidth <= 700
-            ? b.top <= window.innerHeight - 28 - 46
+            ? b.top <= 28 + 46            // Stories has no room left for them at its bottom
             : b.top <= line;
           // Ride along at the vertical middle of the Thoughts section; once that
           // middle scrolls up to the top-left corner, stay pinned there.
@@ -3296,9 +3378,9 @@
             // ride with the middle of Thoughts; never above the top line, and on
             // phones never below the bottom edge of the screen
             let y = Math.max(b.top + b.height / 2, dockTop() + half);
-            // Phones: once Stories ends the buttons simply sit fixed on the left and
-            // right edges, halfway down the screen (no riding along = no jitter).
-            if (side) header.style.top = window.innerWidth <= 700 ? '50%' : y + 'px';
+            // Phones: once Stories ends the buttons glide apart to the top-left and
+            // top-right corners and stay fixed there (no riding along = no jitter).
+            if (side) header.style.top = window.innerWidth <= 700 ? (dockTop() + half) + 'px' : y + 'px';
             else header.style.top = '';
           };
           if (side !== header.classList.contains('side')){
@@ -3381,6 +3463,19 @@
             clearTimeout(checkStories.t);
             checkStories.t = setTimeout(() => header.classList.remove('melt'), 950);
           }
+        }
+        // Phones: the bottom-centre buttons stay anchored to the bottom of Stories —
+        // 28px above the screen edge, and once Stories' bottom edge scrolls up past
+        // that they ride up with it (still inside Stories) until there's no room
+        // left; then they glide out to the two corners of Thoughts.
+        const blogEl = document.getElementById('blog');
+        if (blogEl && window.innerWidth <= 700 && header.classList.contains('on-stories') && !header.classList.contains('side')){
+          const bt = blogEl.getBoundingClientRect().top;
+          header.style.bottom = Math.max(28, window.innerHeight - bt + 28) + 'px';
+          // they're over dark Stories now, never the white page
+          header.classList.toggle('on-light', false);
+        } else if (header.style.bottom){
+          header.style.bottom = '';
         }
       }
       const _check = check;
@@ -3526,7 +3621,7 @@
           c.style.opacity = vis ? Math.min(1, (1.15 - a) / 0.35).toFixed(3) : '0';
           c.style.zIndex = String(20 - Math.round(Math.abs(d) * 4));
           c.style.pointerEvents = Math.abs(d) < 0.5 ? 'auto' : 'none';
-          c.style.filter = `brightness(${(1 - Math.min(1, a) * 0.6).toFixed(3)})`;
+          c.style.filter = `brightness(${(1 - Math.min(1, a) * 0.72).toFixed(3)})`;
           c.style.setProperty('--c', '1');
           c.style.background = 'var(--tint)';
           c.style.boxShadow = '';
@@ -3547,133 +3642,54 @@
           b.setAttribute('aria-current', i === active ? 'true' : 'false');
         });
       }
-      function frame(t){
-        const dt = Math.min(0.033, last_t ? (t - last_t) / 1000 : 0.016); last_t = t;
-        if (!dragging){
-          const a = K * (target - pos) - C * vel;
-          vel += a * dt; pos += vel * dt;
-          if (Math.abs(target - pos) < 0.0008 && Math.abs(vel) < 0.002){ pos = target; vel = 0; restAt = performance.now(); }
-        }
+      // ---- Scroll-driven: page scroll position IS the reel position ----
+      // The section is (1 screen + 3 steps) tall; while it passes, its stage is pinned
+      // and progress through it maps to card 0 → 3. When Nature lands, the section ends
+      // and normal scrolling simply continues — nothing to hold, nothing to unlock.
+      const stepPx = () => (section.offsetHeight - window.innerHeight) / Math.max(1, last);
+      const startY = () => section.getBoundingClientRect().top + window.scrollY;
+      const cardY = (i) => startY() + clamp(i, 0, last) * stepPx();
+      let scrollRaf = null, idle = null, touching = false;
+      function fromScroll(){
+        scrollRaf = null;
+        const run = section.offsetHeight - window.innerHeight;
+        const p = run > 0 ? clamp(-section.getBoundingClientRect().top / run, 0, 1) : 0;
+        pos = p * last; target = pos;
         paint();
-        if (dragging || pos !== target) raf = requestAnimationFrame(frame);
-        else { raf = null; last_t = 0; }
       }
-      const kick = () => { if (!raf){ last_t = 0; raf = requestAnimationFrame(frame); } };
-      function go(i){
-        const n = clamp(i, 0, last);
-        if (reduce){ target = pos = n; vel = 0; paint(); return; }
-        target = n; kick();
+      function glideTo(y){
+        if (window.__glide) window.__glide.scrollTo(y);
+        else window.scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
       }
-      // keep the API used elsewhere
-      const onRightHalf = () => true;                       // the whole section steers the reel
-      const inView = () => Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.35;
-      const atEdge = (dir) => (dir < 0 && target === 0) || (dir > 0 && target === last);
-
-      // Wheel = continuous scrub: the stack turns with the scroll itself (like a
-      // picker wheel), then settles on the nearest card shortly after you stop.
-      let settleTimer = null;
-      section.addEventListener('wheel', (e) => {
-        if (!onRightHalf(e.clientX) || !inView()) return;
-        let dy = e.deltaY;
-        if (e.deltaMode === 1) dy *= 40; else if (e.deltaMode === 2) dy *= window.innerHeight;
-        const dir = Math.sign(dy);
-        if (!dir) return;
-        // the page only moves on once the reel has rested on the first/last card for
-        // a moment, so one fast flick can't race through the cards and out
-        const now = performance.now();
-        const atStart = target <= 0.001 && pos <= 0.02 && now - restAt > 450;
-        const atEnd = target >= last - 0.001 && pos >= last - 0.02 && now - restAt > 450;
-        if ((dir < 0 && atStart) || (dir > 0 && atEnd)) return;   // let the page continue
-        e.preventDefault();
-        const top = section.getBoundingClientRect().top;
-        if (Math.abs(top) > 2){
-          if (window.__glide) window.__glide.scrollTo(window.scrollY + top);
-          else window.scrollTo({ top: window.scrollY + top, behavior: 'smooth' });
-        }
-        const h = (cards[0] ? cards[0].offsetHeight : 400) * 1.05;
-        target = clamp(target + dy / h, 0, last);
-        kick();
-        clearTimeout(settleTimer);
-        // settle: lean toward the way you were scrolling, so even a single wheel
-        // notch carries on to the next card (tiny trackpad nudges still fall back)
-        const sdir = dir;
-        settleTimer = setTimeout(() => {
-          target = clamp(sdir > 0 ? Math.ceil(target - 0.12) : Math.floor(target + 0.12), 0, last);
-          kick();
-        }, 160);
-      }, { passive:false });
-
-      // Touch: the stack follows your finger, then springs to the nearest card
-      let ty0 = null, pos0 = 0, lastY = 0, lastT = 0, vy = 0, claimed = false;
-      // Any vertical swipe anywhere in the Stories section turns the reel first; only
-      // past the first/last card does the page itself scroll on.
-      section.addEventListener('touchstart', (e) => {
-        ty0 = lastY = e.touches[0].clientY; lastT = performance.now(); vy = 0;
-        pos0 = pos; claimed = false;
+      // when scrolling stops part-way between two cards, ease onto the nearest one
+      function settle(){
+        if (touching || window.__anchoring) return;
+        if (pos <= 0.001 || pos >= last - 0.001) return;
+        const n = Math.round(pos);
+        if (Math.abs(pos - n) < 0.01) return;
+        glideTo(cardY(n));
+      }
+      window.addEventListener('scroll', () => {
+        if (!scrollRaf) scrollRaf = requestAnimationFrame(fromScroll);
+        clearTimeout(idle);
+        idle = setTimeout(settle, 140);
       }, { passive:true });
-      section.addEventListener('touchmove', (e) => {
-        if (ty0 === null) return;
-        const y = e.touches[0].clientY, dy = ty0 - y;
-        const dir = Math.sign(dy);
-        if (!claimed){
-          if (!dir) return;
-          if (!inView() || atEdge(dir)) { ty0 = null; return; }   // let the page scroll
-          claimed = true; dragging = true; vel = 0; kick();
-          const top = section.getBoundingClientRect().top;      // line the section up
-          if (Math.abs(top) > 2) window.scrollTo({ top: window.scrollY + top, behavior: 'smooth' });
-        }
-        e.preventDefault();
-        const now = performance.now();
-        vy = (lastY - y) / Math.max(1, now - lastT); lastY = y; lastT = now;
-        const h = (cards[0] ? cards[0].offsetHeight : 400) * 0.9;
-        let p = pos0 + dy / h;
-        if (p < 0) p = -rubber(-p); else if (p > last) p = last + rubber(p - last);
-        pos = p;
-      }, { passive:false });
-      const endTouch = () => {
-        if (ty0 === null) return;
-        ty0 = null;
-        if (!claimed) return;
-        dragging = false;
-        const h = (cards[0] ? cards[0].offsetHeight : 400) * 0.9;
-        vel = vy * 1000 / h;                                 // carry the flick
-        const proj = pos + vel * 0.18;
-        target = clamp(Math.round(proj), 0, last);
-        kick();
-      };
-      section.addEventListener('touchend', endTouch);
-      section.addEventListener('touchcancel', endTouch);
+      window.addEventListener('touchstart', () => { touching = true; clearTimeout(idle); }, { passive:true });
+      window.addEventListener('touchend', () => { touching = false; clearTimeout(idle); idle = setTimeout(settle, 220); }, { passive:true });
+      window.addEventListener('resize', fromScroll, { passive:true });
 
+      const go = (i) => glideTo(cardY(i));
       stage.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown' || e.key === 'ArrowRight'){ e.preventDefault(); go(target + 1); }
-        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ e.preventDefault(); go(target - 1); }
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight'){ e.preventDefault(); go(Math.round(pos) + 1); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ e.preventDefault(); go(Math.round(pos) - 1); }
       });
       cards.forEach((c, i) => c.addEventListener('click', (e) => {
         if (i !== active){ e.preventDefault(); go(i); }
       }));
       dots.forEach((b, i) => b.addEventListener('click', () => go(i)));
-      window.addEventListener('resize', paint, { passive:true });
 
-      // Hold: scrolling down into Stories stops at the section until the last card
-      // has been reached; scrolling back up stops there until the first card.
-      // (In-page links bypass this.)
-      let holdY = window.scrollY;
-      window.addEventListener('scroll', () => {
-        const y = window.scrollY, top = section.getBoundingClientRect().top + y;
-        if (!window.__anchoring){
-          const down = y > holdY, up = y < holdY;
-          if ((down && holdY <= top + 1 && y > top + 1 && target < last) ||
-              (up && holdY >= top - 1 && y < top - 1 && target > 0)){
-            window.scrollTo(0, top);
-            if (window.__glide) window.__glide.stop();
-            holdY = top;
-            return;
-          }
-        }
-        holdY = y;
-      }, { passive:true });
-
-      labels(); paint();
+      fromScroll();
+      labels();
     })();
 
     // Init

@@ -47,12 +47,99 @@
     lb.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
-  function step(d){ show((current + d + srcs.length) % srcs.length); }
+  // step with a short slide: the photo leaves toward the swipe and the next
+  // one comes in from the other side
+  let sliding = false, pending = 0;
+  function step(d, fromX){
+    if (srcs.length < 2) return;
+    if (sliding){ pending = d; return; }               // queue it; runs as soon as this slide ends
+    sliding = true;
+    const w = Math.min(window.innerWidth * 0.35, 260);
+    const out = lbImg.animate(
+      [{ transform: `translateX(${fromX || 0}px)`, opacity: 1 }, { transform: `translateX(${-d * w}px)`, opacity: 0 }],
+      { duration: 140, easing: 'cubic-bezier(.4,0,1,1)', fill: 'forwards' });
+    out.onfinish = () => {
+      show((current + d + srcs.length) % srcs.length);
+      const go = () => {
+        out.cancel();
+        lbImg.animate(
+          [{ transform: `translateX(${d * w}px)`, opacity: 0 }, { transform: 'translateX(0)', opacity: 1 }],
+          { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)' }).onfinish = () => {
+            sliding = false;
+            if (pending){ const p = pending; pending = 0; step(p); }
+          };
+      };
+      if (lbImg.decode) lbImg.decode().then(go, go); else go();
+    };
+  }
+
+  // ---- swipe / drag the open photo (finger, pen or mouse) ----
+  let sx = 0, sy = 0, dx = 0, st = 0, swiping = false, axis = null, lbMoved = false;
+  lb.addEventListener('pointerdown', (e) => {
+    if (!lb.classList.contains('open') || e.target.closest('button') || sliding) return;
+    swiping = true; axis = null; lbMoved = false;
+    sx = e.clientX; sy = e.clientY; dx = 0; st = performance.now();
+  });
+  window.addEventListener('pointermove', (e) => {
+    if (!swiping) return;
+    const mx = e.clientX - sx, my = e.clientY - sy;
+    if (!axis && Math.hypot(mx, my) > 8) axis = Math.abs(mx) > Math.abs(my) ? 'x' : 'y';
+    if (axis !== 'x') return;
+    lbMoved = true;
+    dx = mx;
+    lbImg.style.transition = 'none';
+    lbImg.style.transform = `translateX(${dx}px)`;
+    lbImg.style.opacity = String(1 - Math.min(0.5, Math.abs(dx) / 600));
+  });
+  function endSwipe(){
+    if (!swiping) return;
+    swiping = false;
+    if (axis !== 'x'){ return; }
+    const v = dx / Math.max(1, performance.now() - st);          // px per ms
+    const go = Math.abs(dx) > Math.min(90, window.innerWidth * 0.18) || Math.abs(v) > 0.45;
+    lbImg.style.transform = ''; lbImg.style.opacity = ''; lbImg.style.transition = '';
+    if (go && srcs.length > 1) step(dx < 0 ? 1 : -1, dx);
+    else lbImg.animate([{ transform: `translateX(${dx}px)` }, { transform: 'translateX(0)' }],
+                       { duration: 260, easing: 'cubic-bezier(.22,1,.36,1)' });
+  }
+  window.addEventListener('pointerup', endSwipe);
+  window.addEventListener('pointercancel', endSwipe);
+  lbImg.addEventListener('dragstart', (e) => e.preventDefault());
+  lb.style.touchAction = 'none';
+
+  // ---- trackpad / mouse wheel: one swipe = one photo ----
+  // Fires as soon as a swipe has clearly started, then ignores the trackpad's
+  // momentum tail. A new swipe is recognised either after a short pause or when
+  // the deltas start rising again (momentum only ever decays).
+  let wAcc = 0, wLocked = false, wLast = 0, wPeak = 0, wMin = Infinity, wDecay = false;
+  lb.addEventListener('wheel', (e) => {
+    if (!lb.classList.contains('open')) return;
+    e.preventDefault();
+    let d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (e.deltaMode === 1) d *= 40;
+    const now = performance.now(), mag = Math.abs(d);
+    let fresh = now - wLast > 140;
+    if (wLocked && !fresh){
+      // after a swipe fires: watch its momentum die down; a clear rise after
+      // that is the next swipe
+      wPeak = Math.max(wPeak, mag);
+      if (mag < wPeak * 0.6) wDecay = true;
+      if (wDecay){ wMin = Math.min(wMin, mag); if (mag > wMin * 2 + 4) fresh = true; }
+    }
+    wLast = now;
+    if (fresh){ wLocked = false; wAcc = 0; }
+    if (wLocked) return;
+    wAcc += d;
+    if (Math.abs(wAcc) >= 14){
+      step(wAcc > 0 ? 1 : -1);
+      wLocked = true; wAcc = 0; wPeak = mag; wMin = Infinity; wDecay = false;
+    }
+  }, { passive:false });
 
   lb.querySelector('.lb-close').addEventListener('click', close);
   lb.querySelector('.lb-prev').addEventListener('click', (e) => { e.stopPropagation(); step(-1); });
   lb.querySelector('.lb-next').addEventListener('click', (e) => { e.stopPropagation(); step(1); });
-  lb.addEventListener('click', (e) => { if (e.target === lb) close(); });
+  lb.addEventListener('click', (e) => { if (e.target === lb && !lbMoved) close(); lbMoved = false; });
   document.addEventListener('keydown', (e) => {
     if (!lb.classList.contains('open')) return;
     if (e.key === 'Escape') close();

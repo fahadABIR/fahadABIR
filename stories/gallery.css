@@ -104,8 +104,8 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:18px;
-  padding: calc(var(--dock-in) + 46px + clamp(28px, 5vh, 56px)) var(--pad) 26px;
+  gap: clamp(14px, 2vh, 20px);
+  padding: calc(var(--dock-in) + 46px + clamp(20px, 4vh, 44px)) var(--pad) 20px;
   background: linear-gradient(to bottom, #001829 72%, rgba(0,24,41,0));
 }
 
@@ -123,27 +123,46 @@ body{
 .gx-brand b{font-weight:700}
 .gx-brand .reg{font-weight:400}
 
-/* category switcher */
+/* Story header: the open story's name, large and spaced like the home page's
+   STORIES heading; beneath it, a quiet row of all four. The open one is marked
+   with the glider's yellow dot. */
+.gx-title{
+  margin:0;
+  font-size: clamp(26px, 3.2vw, 44px);
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  line-height:1;
+  color: var(--fg);
+  padding-left:.14em;               /* balance the trailing letter-spacing */
+}
 .cat-nav{
   display:flex;
-  align-items:center;
-  gap:14px;
-  flex-wrap:wrap;
   justify-content:center;
-  margin-bottom: clamp(8px, 1.5vw, 16px);
+  gap: clamp(18px, 2.6vw, 34px);
+  margin: 0 0 clamp(8px, 1.5vw, 16px);
 }
 .cat-nav a{
+  position:relative;
+  padding: 4px 0 10px;
   text-decoration:none;
-  text-transform:lowercase;
-  letter-spacing:.2em;
-  font-size:12px;
+  font-size:10px;
   font-weight:500;
-  color: rgba(245,246,247,.38);
-  transition: color .2s ease, transform .2s ease;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color: rgba(245,246,247,.34);
+  transition: color .25s ease;
 }
-.cat-nav a:hover{ color: rgba(245,246,247,.85); }
-.cat-nav a.active{ color: #ffffff; }
-.cat-nav .dot{ color: rgba(245,246,247,.25); font-size:11px; }
+.cat-nav a::after{
+  content:""; position:absolute; left:50%; bottom:0;
+  width:4px; height:4px; margin-left:-2px; border-radius:50%;
+  background:#ffd60a;
+  opacity:0; transform: scale(.3);
+  transition: opacity .25s ease, transform .35s cubic-bezier(.22,1,.36,1);
+}
+.cat-nav a:hover{ color: rgba(245,246,247,.8); }
+.cat-nav a.active{ color: rgba(245,246,247,.9); }
+.cat-nav a.active::after{ opacity:1; transform: scale(1); }
 
 /* ---- Gallery grid ---- */
 .gallery{

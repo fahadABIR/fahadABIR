@@ -35,7 +35,7 @@
       overflow-x:hidden;
     }
 
-    html{scroll-behavior:smooth}
+    html{scroll-behavior:smooth; overflow-anchor:none}
 
     /* Sections */
     .panel{
@@ -667,12 +667,6 @@
     @media (max-width: 899px){
       .gal-hole .chev-1{ display:none; }
       .gal-hole .chev-2{ display:inline; }
-    }
-    /* phones: a very short black fade where Stories hands over to the white Thoughts */
-    @media (max-width: 899px){
-      #blog .bg.old-paper{
-        background: linear-gradient(to bottom, #000305 0, #000305 1px, #FFFFFF 9vh, #FFFFFF 100%) !important;
-      }
     }
     /* dots turn upright while the menu is open */
     .hamburger.nav-more svg{ transition: transform .45s cubic-bezier(.22,1,.36,1); }
@@ -3204,22 +3198,6 @@
       window.addEventListener('scroll', sync, { passive:true });
       window.addEventListener('resize', () => { target = clampY(target); }, { passive:true });
 
-      // In-page links (#reel, #blog …) glide too.
-      document.addEventListener('click', (e) => {
-        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
-        const a = e.target.closest && e.target.closest('a[href^="#"]');
-        if (!a) return;
-        const hash = a.getAttribute('href');
-        if (!hash || hash.length < 2) return;
-        let el = null; try { el = document.querySelector(hash); } catch(_) {}
-        if (!el) return;
-        e.preventDefault();
-        current = window.scrollY;
-        target = clampY(el.getBoundingClientRect().top + window.scrollY);
-        start();
-        try { history.pushState(null, '', hash); } catch(_) {}
-      });
-
       window.__glide = {
         stop,
         scrollTo(y){ current = window.scrollY; target = clampY(y); start(); }
@@ -3474,6 +3452,40 @@
       } else start();
     })();
 
+    // In-page links (Stories / Thoughts / Contact, the skip arrows): a dedicated
+    // tween that re-aims at the section every frame, so nothing on the way (sticky
+    // photos, the floating buttons moving, the stories hold) can stop it early.
+    (function anchorLinks(){
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let raf = null;
+      document.addEventListener('click', (e) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        const a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a) return;
+        const hash = a.getAttribute('href');
+        if (!hash || hash.length < 2) return;
+        let el = null; try { el = document.querySelector(hash); } catch(_) {}
+        if (!el) return;
+        e.preventDefault();
+        if (window.__glide) window.__glide.stop();
+        const maxY = () => Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const aim = () => Math.min(maxY(), Math.max(0, el.getBoundingClientRect().top + window.scrollY));
+        const y0 = window.scrollY, dist = Math.abs(aim() - y0);
+        try { history.pushState(null, '', hash); } catch(_) {}
+        if (raf) cancelAnimationFrame(raf);
+        window.__anchoring = true;
+        if (reduce || dist < 2){ window.scrollTo(0, aim()); window.__anchoring = false; return; }
+        const D = Math.min(1500, 650 + dist * 0.06), t0 = performance.now();
+        const ease = (t) => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+        (function step(now){
+          const k = Math.min(1, (now - t0) / D);
+          window.scrollTo(0, y0 + (aim() - y0) * ease(k));
+          if (k < 1) raf = requestAnimationFrame(step);
+          else { raf = null; window.scrollTo(0, aim()); setTimeout(() => { window.__anchoring = false; }, 80); }
+        })(t0);
+      }, true);
+    })();
+
     // Stories: vertical 3D stack. Wheel over the RIGHT half flips stories;
     // over the LEFT half the page scrolls normally. At the first/last story the
     // wheel falls through to the page so you can scroll past the section.
@@ -3489,7 +3501,7 @@
       const last = cards.length - 1;
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       let target = 0, pos = 0, vel = 0, active = 0, raf = null, last_t = 0;
-      let dragging = false, lock = false, acc = 0, lockTimer = null;
+      let dragging = false, lock = false, acc = 0, lockTimer = null, restAt = 0;
       // tuned to the reference: arrives in ~0.17s, overshoots ~8%, eases back in ~0.3s
       // buttery: soft, heavy spring that glides and settles with just a hint of bounce
       const K = 105, C = 2 * Math.sqrt(K) * 0.76;            // spring stiffness / damping
@@ -3541,7 +3553,7 @@
         if (!dragging){
           const a = K * (target - pos) - C * vel;
           vel += a * dt; pos += vel * dt;
-          if (Math.abs(target - pos) < 0.0008 && Math.abs(vel) < 0.002){ pos = target; vel = 0; }
+          if (Math.abs(target - pos) < 0.0008 && Math.abs(vel) < 0.002){ pos = target; vel = 0; restAt = performance.now(); }
         }
         paint();
         if (dragging || pos !== target) raf = requestAnimationFrame(frame);
@@ -3554,7 +3566,7 @@
         target = n; kick();
       }
       // keep the API used elsewhere
-      const onRightHalf = (x) => window.innerWidth <= 800 || x >= window.innerWidth / 2;
+      const onRightHalf = () => true;                       // the whole section steers the reel
       const inView = () => Math.abs(section.getBoundingClientRect().top) < window.innerHeight * 0.35;
       const atEdge = (dir) => (dir < 0 && target === 0) || (dir > 0 && target === last);
 
@@ -3567,7 +3579,11 @@
         if (e.deltaMode === 1) dy *= 40; else if (e.deltaMode === 2) dy *= window.innerHeight;
         const dir = Math.sign(dy);
         if (!dir) return;
-        const atStart = target <= 0.001 && pos <= 0.02, atEnd = target >= last - 0.001 && pos >= last - 0.02;
+        // the page only moves on once the reel has rested on the first/last card for
+        // a moment, so one fast flick can't race through the cards and out
+        const now = performance.now();
+        const atStart = target <= 0.001 && pos <= 0.02 && now - restAt > 450;
+        const atEnd = target >= last - 0.001 && pos >= last - 0.02 && now - restAt > 450;
         if ((dir < 0 && atStart) || (dir > 0 && atEnd)) return;   // let the page continue
         e.preventDefault();
         const top = section.getBoundingClientRect().top;
@@ -3579,7 +3595,13 @@
         target = clamp(target + dy / h, 0, last);
         kick();
         clearTimeout(settleTimer);
-        settleTimer = setTimeout(() => { target = Math.round(target); kick(); }, 160);
+        // settle: lean toward the way you were scrolling, so even a single wheel
+        // notch carries on to the next card (tiny trackpad nudges still fall back)
+        const sdir = dir;
+        settleTimer = setTimeout(() => {
+          target = clamp(sdir > 0 ? Math.ceil(target - 0.12) : Math.floor(target + 0.12), 0, last);
+          kick();
+        }, 160);
       }, { passive:false });
 
       // Touch: the stack follows your finger, then springs to the nearest card
@@ -3632,6 +3654,25 @@
       }));
       dots.forEach((b, i) => b.addEventListener('click', () => go(i)));
       window.addEventListener('resize', paint, { passive:true });
+
+      // Hold: scrolling down into Stories stops at the section until the last card
+      // has been reached; scrolling back up stops there until the first card.
+      // (In-page links bypass this.)
+      let holdY = window.scrollY;
+      window.addEventListener('scroll', () => {
+        const y = window.scrollY, top = section.getBoundingClientRect().top + y;
+        if (!window.__anchoring){
+          const down = y > holdY, up = y < holdY;
+          if ((down && holdY <= top + 1 && y > top + 1 && target < last) ||
+              (up && holdY >= top - 1 && y < top - 1 && target > 0)){
+            window.scrollTo(0, top);
+            if (window.__glide) window.__glide.stop();
+            holdY = top;
+            return;
+          }
+        }
+        holdY = y;
+      }, { passive:true });
 
       labels(); paint();
     })();

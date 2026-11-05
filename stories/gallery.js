@@ -128,8 +128,9 @@
   }, { passive:false });
 
   // drag / swipe on the strip
-  let px = null, pos0 = 0, moved = 0, lx = 0, lt = 0, vx = 0;
+  let px = null, pos0 = 0, moved = 0, lx = 0, lt = 0, vx = 0, downCard = null;
   gallery.addEventListener('pointerdown', (e) => {
+    downCard = e.target.closest ? e.target.closest('.g-card') : null;   // remember what was pressed
     px = lx = e.clientX; lt = performance.now(); pos0 = pos; moved = 0; vx = 0;
     dragging = true; vel = 0; kick();
     gallery.setPointerCapture && gallery.setPointerCapture(e.pointerId);
@@ -146,7 +147,7 @@
     if (px === null) return;
     px = null; dragging = false;
     if (moved < 6){                                       // a tap, not a drag
-      const el = e.target.closest && e.target.closest('.g-card');
+      const el = downCard;
       const i = el ? cards.indexOf(el) : -1;
       if (i >= 0){ if (i === Math.round(pos)) show(i); else go(i); return; }
     }

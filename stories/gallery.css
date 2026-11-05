@@ -325,6 +325,8 @@ body{
 /* ---- Fish-eye strip (story pages) ---- */
 .gallery.strip{
   position:relative;
+  z-index:0;
+  isolation:isolate;          /* card stacking stays inside the strip, so the photo viewer opens on top */
   display:block;
   flex:1 0 auto;
   min-height: 58vh;
